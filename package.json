@@ -1,0 +1,32 @@
+{
+  "name": "letterfrommsplanner",
+  "version": "1.0.0",
+  "description": "create a letter from the task of a MS Planner",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diannedejesus/letter-generator.git"
+  },
+  "keywords": [
+    "msplanner",
+    "exchange",
+    "ews",
+    "ms365",
+    "msgraph",
+    "nodejs"
+  ],
+  "author": "Dianne M. De Jesús",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/diannedejesus/letter-generator/issues"
+  },
+  "homepage": "https://github.com/diannedejesus/letter-generator#readme",
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "ejs": "^3.1.6",
+    "express": "^4.17.3"
+  }
+}
