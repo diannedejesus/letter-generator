@@ -93,8 +93,10 @@ Learn how to create a low-fidelity wireframe in Lucidchart to include within you
     - [ ] due date: date selector, only future dates
 
     - [ ] Connect to 365
+        - [X] Register App on MS Identity Platform
+        - [X] Setup passport to get token
         - [ ] Get API handler setup
-        - [ ] Get account login information
+        - [X] Get account login information
         - [ ] Access account
 
         - [ ] Access correct planner
@@ -144,7 +146,8 @@ If not an external component
 
 
 ### Wishlist Feature
-
+- [ ] contacts from MS365
+- [ ] letter template from MSWord
 
 
 <!-- #### Future

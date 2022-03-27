@@ -1,97 +1,15 @@
-//const NameReferenceDB = require('../models/NameReference')
-//const HistoricImportDB = require('../models/HistoricImport')
-//const SubmittedInformationDB = require('../models/SubmittedInformation')
-//const VerifiedDataDB = require('../models/VerifiedData')
 //const ewsOptions = require('../ewsConnections')
-//const validator = require('validator');
-//const { nanoid } = require('nanoid')
-//const { each } = require('mongodb/lib/operations/cursor_ops')
 
 module.exports = { 
     index: async (req,res)=>{
         try{
-            // const verifiedData = await VerifiedDataDB.find()
-            // const historicData = await HistoricImportDB.find()
-            // const nameReferenceData = await NameReferenceDB.find({accessCount: {$exists: true}})
-            // const submitData = await SubmittedInformationDB.find({}, 'accessLink verifiedDate')
-
-            // let verifiedContacts = 0
-            // let emailCount = 0
-            // let submitCount = 0
-            // let uniqueSubmitCount = []
-            // let linkedAccessed = 0
-            // let noLinkAccessed = 0
-
-            // const buildData = {}
-
-            // for(items of historicData){
-            //     if(items.email){
-            //         emailCount++
-            //     }
-            // }
-
-            // for(items of verifiedData){
-            //     if(!buildData[items.accessLink]) { buildData[items.accessLink] = {} }
-            //     buildData[items.accessLink]['verifiedData'] = items
-            //     verifiedContacts++
-            // }
-
-            // for(items of submitData){
-            //     if(!items.verifiedDate){
-            //         if(!buildData[items.accessLink]) { buildData[items.accessLink] = {} }
-            //         buildData[items.accessLink]['submitAmount'] =  buildData[items.accessLink]['submitAmount'] ? buildData[items.accessLink]['submitAmount']++ : 1
-            //     }
-            //     submitCount++
-            //     if(!uniqueSubmitCount.includes(items.accessLink)){
-            //         uniqueSubmitCount.push(items.accessLink)
-            //     }
-            // }
-
-            // for(items of nameReferenceData){
-            //     if(!buildData[items.accessLink]) { buildData[items.accessLink] = {} }
-            //     buildData[items.accessLink]['accessCount'] = items.accessCount
-            //     if(items.name.firstName.toLowerCase() !== 'empty'){
-            //         linkedAccessed += items.accessCount
-            //     }else{
-            //         noLinkAccessed = items.accessCount
-            //     }
-            // }
-
-            // //compile information for dashboard
-            // for(items of historicData){
-            //      if(buildData[items.accessLink] && buildData[items.accessLink]['verifiedData'] && !buildData[items.accessLink]['submitAmount']){
-            //         if(!items.email && buildData[items.accessLink]['verifiedData'].email){
-            //             emailCount++
-            //         }
-            //         items = Object.assign(items, buildData[items.accessLink]['verifiedData'])
-            //         items.status = 'verified'
-            //     } else if(buildData[items.accessLink] && buildData[items.accessLink]['verifiedData'] && buildData[items.accessLink]['submitAmount']) {
-            //         items = Object.assign(items, buildData[items.accessLink]['verifiedData'])
-            //         items.status = 'verified data and ' + buildData[items.accessLink]['submitAmount'] + ' new submits'
-            //     }else if(buildData[items.accessLink] && buildData[items.accessLink]['submitAmount'] > 0){
-            //         items.status = buildData[items.accessLink]['submitAmount'] + ' submits'
-            //     } else {
-            //         items.status = 'pending'
-            //     }
-
-            //     if(buildData[items.accessLink]){
-            //         items.accessed = buildData[items.accessLink].accessCount
-            //     }else{
-            //         items.accessed = 0
-            //     }
-                
-            // }
-
-
-
+        
+            if(req.session.accessToken){ 
+                console.log(req.session)
+            }
+          
             res.render('index.ejs', { 
-                // reservations: historicData, 
-                // emailCount, 
-                // submitCount, 
-                // uniqueSubmitCount: uniqueSubmitCount.length, 
-                // linkedAccessed, 
-                // noLinkAccessed,
-                // verifiedContacts
+                //user: user,
             })
 
         }catch(err){
