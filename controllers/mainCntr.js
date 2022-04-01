@@ -1,15 +1,18 @@
 //const ewsOptions = require('../ewsConnections')
+const graph = require('../graph')
 
 module.exports = { 
     index: async (req,res)=>{
         try{
-        
+            //console.log(req.session.passport.user)
+            let userId //= await graph.getUserDetails(req.session.accessToken)
             if(req.session.accessToken){ 
-                console.log(req.session)
+                //console.log(req.session)
+                userId = await graph.getUserPlanners(req.session.accessToken, req.session.microsoftId) 
             }
-          
+          console.log(userId[0].planner[0].title)
             res.render('index.ejs', { 
-                //user: user,
+                planner: userId[0],
             })
 
         }catch(err){

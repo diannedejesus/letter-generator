@@ -24,6 +24,7 @@ module.exports = function (passport) {
   // and an access token has been obtained
   async function signInComplete(iss, sub, profile, accessToken, refreshToken, params, done) {
     console.log(profile)
+    //console.log(accessToken)
     if (!profile.oid) {
       return done(new Error("No OID found in user profile."), null);
     }
@@ -70,7 +71,7 @@ module.exports = function (passport) {
   })
 
   passport.deserializeUser((id, done) => {
-    User.findById(id, (err, user) => done(err, user))
+    done(null, id)
   })
 
 }
