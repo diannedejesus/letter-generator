@@ -5,18 +5,32 @@ module.exports = {
     index: async (req,res)=>{
         try{
             //console.log(req.session.passport.user)
-            let userId //= await graph.getUserDetails(req.session.accessToken)
-            if(req.session.accessToken){ 
-                //console.log(req.session)
-                userId = await graph.getUserPlanners(req.session.accessToken, req.session.microsoftId) 
-            }
-          console.log(userId[0].planner[0].title)
+            let plans = await graph.getUserPlanners(req.session.accessToken, req.session.microsoftId)
+
+            //get planner tasks
+            const tasks = await graph.getAllTasks(req.session.accessToken, plans[0].planner[0].id)
+        console.log(tasks)
+
+            //select desired tasks
+
+
             res.render('index.ejs', { 
-                planner: userId[0],
+                planners: plans ? plans[0] : undefined,
             })
 
         }catch(err){
-            console.log(err)
+            if(err.code === 'InvalidAuthenticationToken'){
+                //getAccessToken(accessToken)
+                console.log('InvalidAuthenticationToken index-mainCntr')
+
+                res.render('index.ejs', { 
+                    planners: undefined,
+                    errors: "You need to Sign in to your 365 Account"
+                })
+              }else{
+                console.log("main error:", err); // TypeError: failed to fetch
+              }
+            
         }
     },
     

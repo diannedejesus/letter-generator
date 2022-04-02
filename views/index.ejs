@@ -11,8 +11,8 @@
 <body>
     <main class='signin clearfix'>
         <section class='logon'>
-            <% if (typeof messages !== 'undefined'){ %> 
-                <p class='message'><%= messages %></p>
+            <% if (typeof errors !== 'undefined'){ %> 
+                <p class='message'><%= errors %></p>
             <% } %>
             <h2>Select from the following options:</h2>
             
@@ -20,6 +20,7 @@
             <h3>Letter Templates</h3>
             <select>
                 <option>Select One</option>
+                <option value="delinquent">Delinquent Landlord</option>
             </select>
             <h3>Date Range</h3>
             <label>Start Date</label>
@@ -31,10 +32,7 @@
             <label>Due Date</label>
             <input type="date">
 
-            <h3>Plannner</h3>
-            
-       <p> <%= planner.planner[0].title %> </p>
-            
+            <h3>Plannner</h3>            
 
             <% if (typeof planners === 'undefined'){ %> 
 
@@ -45,9 +43,9 @@
                 <label>Select a Planner</label>
                 <select>
                     <option>Select One</option>
-                    <% planners.foreach( planner => { %> 
-                    <option><% planner.name %> </option>
-                    <% }) %>
+                    <% for(plans of planners.planner) { %> 
+                    <option value="<%= plans.id %>"><%= plans.title %></option>
+                    <% } %>
                 </select>
 
            <% } %>

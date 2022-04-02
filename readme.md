@@ -95,13 +95,13 @@ Learn how to create a low-fidelity wireframe in Lucidchart to include within you
     - [ ] Connect to 365
         - [X] Register App on MS Identity Platform
         - [X] Setup passport to get token
-        - [ ] Get API handler setup
+        - [x] Get API handler setup
         - [X] Get account login information
-        - [ ] Access account
+        - [x] Access account
 
         - [ ] Access correct planner
-            - [ ] Need a group for planner
-            - [ ] Access planner
+            - [X] Need a group for planner
+            - [X] Access planner
         - [ ] Grab the desired tasks
             - [ ] Filter by date or get all tasks and filter by date inside the app
 

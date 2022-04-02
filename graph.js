@@ -21,10 +21,10 @@ module.exports = {
 
     } catch (error) {
       if(error.code === 'InvalidAuthenticationToken'){
-        //getAccessToken(accessToken)
-        console.log('InvalidAuthenticationToken')
+        //send error to caller
+        throw error
       }else{
-        console.log(error); // TypeError: failed to fetch
+        console.log(error);
       }
     }
   },
@@ -38,7 +38,12 @@ module.exports = {
         .api(`/users/${userID}/transitiveMemberOf`)
         .get();
     } catch (error) {
-        console.log(error); // TypeError: failed to fetch
+      if(error.code === 'InvalidAuthenticationToken'){
+        //send error to caller
+        throw error
+      }else{
+        console.log(error);
+      }
     }
   },
 
@@ -52,7 +57,12 @@ module.exports = {
         .get();
 
     } catch (error) {
-      console.log(error); // TypeError: failed to fetch
+      if(error.code === 'InvalidAuthenticationToken'){
+        //send error to caller
+        throw error
+      }else{
+        console.log(error);
+      }
     }
   },
 
@@ -66,7 +76,12 @@ module.exports = {
         .get();
 
     } catch (error) {
-      console.log(error); // TypeError: failed to fetch
+      if(error.code === 'InvalidAuthenticationToken'){
+        //send error to caller
+        throw error
+      }else{
+        console.log(error);
+      }
     }
   },
 
@@ -80,7 +95,12 @@ module.exports = {
         .get();
 
     } catch (error) {
-      console.log(error); // TypeError: failed to fetch
+      if(error.code === 'InvalidAuthenticationToken'){
+        //send error to caller
+        throw error
+      }else{
+        console.log(error);
+      }
     }
   },
 
@@ -94,7 +114,12 @@ module.exports = {
         .get();
 
     } catch (error) {
-      console.log(error); // TypeError: failed to fetch
+      if(error.code === 'InvalidAuthenticationToken'){
+        //send error to caller
+        throw error
+      }else{
+        console.log(error);
+      }
     }
   },
 
@@ -109,7 +134,12 @@ module.exports = {
         .get();
 
     } catch (error) {
-      console.log(error); // TypeError: failed to fetch
+      if(error.code === 'InvalidAuthenticationToken'){
+        //send error to caller
+        throw error
+      }else{
+        console.log(error);
+      }
     }
   },
 
@@ -120,14 +150,17 @@ module.exports = {
     try {
       getUserGroups = await this.getAllGroups(accessToken, userID)
     } catch(err) {
-      console.log(err); // TypeError: failed to fetch
+      //send error to caller
+      throw err
     }
-    
-    let planners = []
 
+  console.log(getUserGroups)
+
+    let planners = []
+  
     await Promise.all(getUserGroups.value.map(
       async (groupInfo) => {
-       
+       console.log(groupInfo.displayName)
         if(groupInfo.displayName != 'Global Administrator'){
           try {
             const getPlanner  = await this.getAllPlanners(accessToken, groupInfo.id)
@@ -146,36 +179,48 @@ module.exports = {
 
   searchAllPlanners: async function (accessToken, userID, searchTerm){
     console.log('searchAllPlanners')
-    const planners = await this.getUserPlanners(accessToken, userID)
-    
-    let plannerIDs = []
-    let plannerTasks = []
+    try {
+      const planners = await this.getUserPlanners(accessToken, userID)
+      let plannerIDs = []
+      let plannerTasks = []
 
-    planners.forEach(plannerGroup => {
-      plannerGroup.planner.forEach(plannerInfo => {
-        return plannerIDs.push({id: plannerInfo.id, group: plannerGroup.group, name: plannerInfo.title})
+      planners.forEach(plannerGroup => {
+        plannerGroup.planner.forEach(plannerInfo => {
+          return plannerIDs.push({id: plannerInfo.id, group: plannerGroup.group, name: plannerInfo.title})
+        })
       })
-    })
-    
-    await Promise.all(plannerIDs.map(
-      async (plannerInfo) => {
-          try {
-            const getTasks  = await this.getAllTasks(accessToken, plannerInfo.id)
 
-            getTasks.value.forEach(taskInfo => {
-              plannerTasks.push({title: taskInfo.title, id: plannerInfo.id, group: plannerInfo.group, planName: plannerInfo.name})
-            })
 
-          } catch(err) {
-            console.log(err); // TypeError: failed to fetch
+      await Promise.all(plannerIDs.map(
+        async (plannerInfo) => {
+            try {
+              const getTasks  = await this.getAllTasks(accessToken, plannerInfo.id)
+  
+              getTasks.value.forEach(taskInfo => {
+                plannerTasks.push({title: taskInfo.title, id: plannerInfo.id, group: plannerInfo.group, planName: plannerInfo.name})
+              })
+  
+            } catch(err) {
+              console.log(err);
+            }
           }
+      ))
+
+
+      //find task
+      console.log('Searched for task')
+
+      return plannerTasks.filter( taskInfo => taskInfo.title.toLowerCase().includes( searchTerm.toLowerCase() ) )
+
+    } catch (error) {
+      if(error.code === 'InvalidAuthenticationToken'){
+        //send error to caller
+        throw error
+      }else{
+        console.log(error);
       }
-    ))
+    }
 
-    //find task
-    console.log('Searched for task')
-
-    return plannerTasks.filter( taskInfo => taskInfo.title.toLowerCase().includes( searchTerm.toLowerCase() ) )
   },
 
   createBucket: async function getMyGroups(accessToken, bucketName, planId) {
@@ -192,7 +237,12 @@ module.exports = {
         .post(plannerBucket);
      
     } catch (error) {
-        console.log(error); // TypeError: failed to fetch
+      if(error.code === 'InvalidAuthenticationToken'){
+        //send error to caller
+        throw error
+      }else{
+        console.log(error);
+      }
     }
   },
 
@@ -213,7 +263,12 @@ module.exports = {
      
      
     } catch (error) {
-        console.log(error); // TypeError: failed to fetch
+      if(error.code === 'InvalidAuthenticationToken'){
+        //send error to caller
+        throw error
+      }else{
+        console.log(error);
+      }
     }
   },
 
@@ -234,7 +289,12 @@ module.exports = {
      
      
     } catch (error) {
-        console.log(error); // TypeError: failed to fetch
+      if(error.code === 'InvalidAuthenticationToken'){
+        //send error to caller
+        throw error
+      }else{
+        console.log(error);
+      }
     }
   },
 
@@ -253,7 +313,12 @@ module.exports = {
      
      
     } catch (error) {
-        console.log(error); // TypeError: failed to fetch
+      if(error.code === 'InvalidAuthenticationToken'){
+        //send error to caller
+        throw error
+      }else{
+        console.log(error);
+      }
     }
   },
 
@@ -285,7 +350,12 @@ module.exports = {
         .update(plannerTask);
 
     } catch (error) {
-      console.log(error); //TypeError: failed to fetch
+      if(error.code === 'InvalidAuthenticationToken'){
+        //send error to caller
+        throw error
+      }else{
+        console.log(error);
+      }
     }
   },
 
@@ -300,7 +370,12 @@ module.exports = {
         .get();
      
     } catch (error) {
-        console.log(error); // TypeError: failed to fetch
+      if(error.code === 'InvalidAuthenticationToken'){
+        //send error to caller
+        throw error
+      }else{
+        console.log(error);
+      }
     }
   },
   
@@ -311,9 +386,10 @@ function getAuthenticatedClient(accessToken) {
   // Initialize Graph client
   const client = graph.Client.init({
     // Use the provided access token to authenticate requests
-    authProvider: (done) => {
-      done(null, accessToken);
-    }
+      authProvider: (done) => {
+        done(null, accessToken);
+      }
+
   });
   console.log('getAuthenticatedClient')
   return client
