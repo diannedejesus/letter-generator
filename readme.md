@@ -102,8 +102,9 @@ Learn how to create a low-fidelity wireframe in Lucidchart to include within you
         - [ ] Access correct planner
             - [X] Need a group for planner
             - [X] Access planner
-        - [ ] Grab the desired tasks
-            - [ ] Filter by date or get all tasks and filter by date inside the app
+        - [X] Grab the desired tasks
+            - [X] Filter by date or get all tasks and filter by date inside the app
+            - [ ] Verify if date selection is accurate when needing exact dates
 
     - [ ] Save task in a collection
     - [ ] As is or sort out the desired info unto an object
@@ -141,7 +142,7 @@ If not an external component
 
 
 ### Secondary Goals
-
+- [ ] Verify why you need to login twice to adquire 365 tokens
 
 
 

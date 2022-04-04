@@ -4,12 +4,40 @@ const graph = require('../graph')
 module.exports = { 
     index: async (req,res)=>{
         try{
-            //console.log(req.session.passport.user)
+            if(!req.session.accessToken){
+                res.render('index.ejs', { 
+                    planners: undefined,
+                })
+            }
+    //console.log(req.session.passport.user)
             let plans = await graph.getUserPlanners(req.session.accessToken, req.session.microsoftId)
 
             //get planner tasks
             const tasks = await graph.getAllTasks(req.session.accessToken, plans[0].planner[0].id)
-        console.log(tasks)
+    //console.log(tasks)
+
+            
+            
+            //filter by date
+            let selectedDate = new Date('March 01, 2022')
+    //console.log(selectedDate)
+            const tasklist = []
+            tasks.value.forEach(item => {
+                let currentDate = new Date(item.startDateTime)
+                currentDate = new Date(`${currentDate.getMonth()} ${currentDate.getDate()}, ${currentDate.getFullYear()}`)
+                
+                if(currentDate.getTime() < selectedDate.getTime()){
+                    tasklist.push(item)
+                }
+            })
+    //console.log(tasklist)
+            
+            //get names
+            const namelist = []
+            tasklist.forEach(item => {
+                namelist.push(item.title.split('-')[0].trim())
+            })
+    console.log(namelist)
 
             //select desired tasks
 
