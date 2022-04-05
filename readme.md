@@ -51,9 +51,64 @@ Then with this we can obtain the addresses of the desired landloards and add the
 
 Once all the data is collected it can be passed to the template view. This view will use the object to create each letter.
 
+## Master Object Model
+
+masterObject = [
+    {
+        name: STRING,
+        address: [
+            line1: STRING,
+            line2: STRING,
+            line2: STRING,
+            line2: STRING,
+        ],
+        tenant: [
+            {
+                taskId: STRING
+                name: STRING,
+                documentList: [STRING, STRING, ect],
+                contractTerms: [startDate, endDate],
+            },
+        ],
+    },
+]
 
 
 
+<!-- {
+  '@odata.context': "https://graph.microsoft.com/v1.0/$metadata#planner/tasks('yVPKHpWq_EGZkM_8VrqmQWUAALaD')/details/$entity",
+  '@odata.etag': 'W/"JzEtVGFza0RldGFpbHMgQEBAQEBAQEBAQEBAQEBAXCc="',
+  description: 'Tenant: Name',
+  previewType: 'description',
+  id: 'yVPKHpWq_EGZkM_8VrqmQWUAALaD',
+  references: {},
+  checklist: {
+    '32791': {
+      '@odata.type': '#microsoft.graph.plannerChecklistItem',
+      isChecked: false,
+      title: 'Document 1',
+      orderHint: '8585535424163267900P7',
+      lastModifiedDateTime: '2022-03-23T19:42:09.1664125Z',
+      lastModifiedBy: [Object]
+    },
+    '47184': {
+      '@odata.type': '#microsoft.graph.plannerChecklistItem',
+      isChecked: false,
+      title: 'Document 2',
+      orderHint: '8585535423Z8',
+      lastModifiedDateTime: '2022-03-23T19:42:13.8696291Z',
+      lastModifiedBy: [Object]
+    },
+    '76866': {
+      '@odata.type': '#microsoft.graph.plannerChecklistItem',
+      isChecked: false,
+      title: 'Contract',
+      orderHint: '8585535423GU',
+      lastModifiedDateTime: '2022-03-23T19:42:18.3294422Z',
+      lastModifiedBy: [Object]
+    }
+  }
+} -->
 
 <!-- ### Databases
 
@@ -92,14 +147,14 @@ Learn how to create a low-fidelity wireframe in Lucidchart to include within you
     - [ ] date range: two date selectors, range from start to end/current
     - [ ] due date: date selector, only future dates
 
-    - [ ] Connect to 365
+    - [X] Connect to 365
         - [X] Register App on MS Identity Platform
         - [X] Setup passport to get token
         - [x] Get API handler setup
         - [X] Get account login information
         - [x] Access account
 
-        - [ ] Access correct planner
+        - [X] Access correct planner
             - [X] Need a group for planner
             - [X] Access planner
         - [X] Grab the desired tasks
@@ -107,7 +162,7 @@ Learn how to create a low-fidelity wireframe in Lucidchart to include within you
             - [X] Verify if date selection is accurate when needing exact dates
 
     - [X] Save task in a collection
-        - [ ] As is or sort out the desired info into an object
+        - [X] As is or sort out the desired info into an object
     - [X] Create a list of unique names for the tasks collected
 
 
@@ -123,8 +178,8 @@ Learn how to create a low-fidelity wireframe in Lucidchart to include within you
     - [ ] Test to see if the correct data is returned
 
 
-- [ ] Add tenant information to the landlord list.
-    - [ ] Calculate dates for the contract duration
+- [X] Add tenant information to the landlord list.
+    - [X] Calculate dates for the contract duration
 
 
 
@@ -167,7 +222,7 @@ If not an external component
 
 
 <!-- NOTES
-
+I would like to test an alternate method for getting detailed task information if the only method is one by one. By making a list of the taskid's and retrieving all the datails. Then using that list to populate the master object.
 
 
  -->

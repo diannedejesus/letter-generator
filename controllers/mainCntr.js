@@ -31,7 +31,7 @@ module.exports = {
                     tasklist.push(item)
                 }
             })
-    console.log(tasklist) //test to see that the tasks were filtered by date displayed
+    //console.log(tasklist) //test to see that the tasks were filtered by date displayed
             
             //creates a list of unique names from the tasks, these tasks need to have a specific format which is: name - string
             let namelist = []
@@ -39,15 +39,51 @@ module.exports = {
             //use namelist as a reference to the master list
             tasklist.forEach(item => {
                 let currentName = item.title.split('-')[0].trim()
+                let startDate = new Date(item.startDateTime)
+                let endDate = new Date(startDate.setFullYear(startDate.getFullYear() + 1))
+                endDate = new Date(endDate.setDate(endDate.getDate() - 1))
+                
+
                 if(!namelist.includes(currentName)){
                     namelist.push(currentName)
+                    masterList.push({
+                        name: currentName,
+                        tenant: [
+                            {
+                                taskId: item.id,
+                                documentList: [],
+                                contractTerm: [startDate,  endDate]
+                            },
+
+                        ]
+                    })
+                }else{
+                    masterList[namelist.indexOf(currentName)].tenant.push({
+                        taskId: item.id,
+                        documentList: [],
+                        contractTerm: [startDate,  endDate]
+                    })
                 }
             })
 
-    console.log(namelist) //test to see that the list is displaying properly
+    //console.log(namelist) //test to see that the list is displaying properly
+    //console.log(masterList)
 
-
-            //select desired tasks
+            //select specific task to grab details
+            for(items of masterList){
+                for(items2 of items.tenant){
+                    let currentItem = await graph.getDetailedTask(req.session.accessToken, items2.taskId)
+            //console.log(currentItem)
+                    items2.name = currentItem.description.split(":")[1].trim()
+            //console.log(items2)
+                    for(item3 in currentItem.checklist){
+                        items2.documentList.push(currentItem.checklist[item3].title)
+            //console.log("tt:", currentItem.checklist[item3].title)
+                    }
+                }
+            }
+            //await graph.getDetailedTask(req.session.accessToken, taskId)
+            console.log(masterList[0].tenant)
 
 
             res.render('index.ejs', { 
