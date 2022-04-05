@@ -9,16 +9,17 @@ module.exports = {
                     planners: undefined,
                 })
             }
-    //console.log(req.session.passport.user)
+            
+            //gets all the planners belonging to a user
             let plans = await graph.getUserPlanners(req.session.accessToken, req.session.microsoftId)
 
-            //get planner tasks
+            //grabs all the tasks from a given planner
             const tasks = await graph.getAllTasks(req.session.accessToken, plans[0].planner[0].id)
-    //console.log(tasks)
+    //console.log(tasks) //test to make sure it is grabbing the task and they are correct
 
             
             
-            //filter by date
+            //filter the tasks by date
             let selectedDate = new Date('March 01, 2022')
     //console.log(selectedDate)
             const tasklist = []
@@ -30,14 +31,21 @@ module.exports = {
                     tasklist.push(item)
                 }
             })
-    //console.log(tasklist)
+    console.log(tasklist) //test to see that the tasks were filtered by date displayed
             
-            //get names
-            const namelist = []
+            //creates a list of unique names from the tasks, these tasks need to have a specific format which is: name - string
+            let namelist = []
+            const masterList = []
+            //use namelist as a reference to the master list
             tasklist.forEach(item => {
-                namelist.push(item.title.split('-')[0].trim())
+                let currentName = item.title.split('-')[0].trim()
+                if(!namelist.includes(currentName)){
+                    namelist.push(currentName)
+                }
             })
-    console.log(namelist)
+
+    console.log(namelist) //test to see that the list is displaying properly
+
 
             //select desired tasks
 
