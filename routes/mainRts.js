@@ -4,5 +4,6 @@ const mainController = require('../controllers/mainCntr')
 
 
 router.get('/', mainController.index)
+router.get('/generateLetters', mainController.generateLetters)
 
 module.exports = router
