@@ -181,7 +181,7 @@ module.exports = {
                     items2.name = currentItem.description.split(":")[1].trim()
             //console.log(items2)
                     for(item3 in currentItem.checklist){
-                        items2.documentList.push(currentItem.checklist[item3].title)
+                        items2.documentList.push(currentItem.checklist[item3].title.trim().toLowerCase())
             //console.log("tt:", currentItem.checklist[item3].title)
                     }
                 }

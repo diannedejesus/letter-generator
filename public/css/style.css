@@ -42,3 +42,38 @@ footer {
 /******************************************
 /* ADDITIONAL STYLES
 /*******************************************/
+
+.errors{
+     color:crimson;
+     font-weight: 900;
+     font-size: x-large;
+     border: 1px solid darkgray;
+ }
+ 
+ .letter{
+     padding: 1.5em;
+     height: 90%;
+ }
+ 
+ address{
+     margin: 4.5em 0;
+ }
+ 
+ .signature {
+     margin: 2em 0;
+ }
+ .signature p, footer p{
+     margin: 0;
+ }
+ footer p{
+     text-align: center;
+ }
+ .letterHeader li{
+     display: inline-block;
+     text-decoration: none;
+     padding: 0 1em;
+     border-left: 1px solid black;
+ }
+ .letterHeader li a{
+     text-decoration: none;
+ }

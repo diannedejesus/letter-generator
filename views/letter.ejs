@@ -18,75 +18,61 @@
     <main>
         <% if(typeof list === 'undefined'){ %>
         <section class="letter">
-            <address>
-                firstName middleInitial lastName<br>
-                street<br>
-                city, state zipcode
-            </address>
-
-            <p>date</p>
-
-            <h2>RE: Incumplimiento de documentaci&oacute;n requerida</h2>
-
-            <section class="letterBody">
-                <p>Participant Name: </p>
-                <p>Vencido desde: </p>
-
-                <p>Certificaci&oacute;n Negativa o evidencia de cumplimiento:</p>
-                <p>Departamento de Hacienda (https://suri.hacienda.pr.gov)</p>
-                <p>Certificaci&oacute;n de Patente del Municipio de Gurabo (787-737-0046)</p>
-                <p>CRIM de la vivienda alqulada (https://emueble.crimpr.net)</p>
-
-                <p>Otros</p>
-                <p>Contrato de Arrendamiento entre ArrendAdor y Participante</p>
-                <p>T&eacute;rmino del contrato: start al end</p>
-                <p>Firmar Contrato HAP</p>
-                
-            </section>
-
-            <section class="signature">
-                <p>Sincerly</p>
-                <p>officials name</p> 
-            </section>
-            <h3>www.localhost:3000/updateInformation/</h3>
+            <p>Something went wrong, click back and try again.</p>
         </section>
-        <footer>
-            <p>This company name</p>
-            <p>our address city, st 000###</p>
-        </footer>
         <% }else{ %>
             <% list.forEach( items => { %> 
                 <address>
-                    firstName middleInitial lastName<br>
+                    <%= items.name %><br>
                     street<br>
                     city, state zipcode
                 </address>
                 <% let date = Date.now() %>
                 <p><%= new Date(date).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></p>
     
-                <h2>RE: Incumplimiento de documentaci&oacute;n requerida</h2>
-    
-                <section class="letterBody">
-                    <p>Participant Name: <%= items.tenant[0].name %></p>
-                    <p>Vencido desde: <%= items.tenant[0].contractTerm[0].toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></p>
-    
-                    <p>Certificaci&oacute;n Negativa o evidencia de cumplimiento:</p>
-                    <p>Departamento de Hacienda (https://suri.hacienda.pr.gov)</p>
-                    <p>Certificaci&oacute;n de Patente del Municipio de Gurabo (787-737-0046)</p>
-                    <p>CRIM de la vivienda alqulada (https://emueble.crimpr.net)</p>
-    
-                    <p>Otros</p>
-                    <p>Contrato de Arrendamiento entre ArrendAdor y Participante</p>
-                    <p>T&eacute;rmino del contrato: <%= items.tenant[0].contractTerm[0].toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %> al <%= items.tenant[0].contractTerm[1].toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></p>
-                    <p>Firmar Contrato HAP</p>
-                    
+                <h1>RE: Incumplimiento de documentaci&oacute;n requerida</h1>
+                
+                <% for(tenants of items.tenant){ %> 
+                    <% if(tenants.documentList.includes('hacienda') || tenants.documentList.includes('patente') || tenants.documentList.includes('crim')) { %>
+                    <section class="letterBody">
+                        <p>Participant Name: <%= tenants.name %></p>
+                        <p>Vencido desde: <%= tenants.contractTerm[0].toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></p>
+                        
+                        <h2>Certificaci&oacute;n Negativa o evidencia de cumplimiento:</h2>
+                        <ul>
+                            <% if(tenants.documentList.includes('hacienda')) { %>
+                                <li>Departamento de Hacienda (https://suri.hacienda.pr.gov)</li>
+                            <% } %>
+                            <% if(tenants.documentList.includes('patente')) { %>
+                                <li>Certificaci&oacute;n de Patente del Municipio de Gurabo (787-737-0046)</li>
+                            <% } %>
+                            <% if(tenants.documentList.includes('crim')) { %>
+                                <li>CRIM de la vivienda alquilada (https://emueble.crimpr.net)</li>
+                            <% } %>
+                        </ul>
+                    <% } %>
+                    <% if(tenants.documentList.includes('hap') || tenants.documentList.includes('contrato')) { %>
+                        <h2>Documentos Additionales:</h2>
+                        <ul>
+                            <% if(tenants.documentList.includes('contrato')) { %>
+                                <li>Contrato de Arrendamiento entre arrendAdor y participante
+                                    <ul>
+                                        <li>T&eacute;rmino del contrato: <%= tenants.contractTerm[0].toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %> al <%= items.tenant[0].contractTerm[1].toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></li>
+                                    </ul>
+                                </li>
+                            <% } %>
+                            <% if(tenants.documentList.includes('hap')) { %>
+                                <li>Firmar Contrato HAP</li>
+                            <% } %>
+                        </ul>
+                    <% } %> 
+                <% } %> 
                 </section>
     
                 <section class="signature">
                     <p>Sincerly</p>
                     <p>officials name</p> 
                 </section>
-                <h3>www.localhost:3000/updateInformation/</h3>
             </section>
             <footer>
                 <p>This company name</p>
