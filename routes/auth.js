@@ -24,6 +24,7 @@ router.get('/signin',
 router.post('/callback',
   function(req, res, next) {
     console.log('Callback was initiated');
+    //console.log(res)
     passport.authenticate('azuread-openidconnect',
       {
         response: res,
@@ -34,16 +35,17 @@ router.post('/callback',
   },
   async function(req, res) {
     console.log('We received a return from AzureAD.');
-    console.log(res.req.user)
+//console.log(res.req.user)
     //req.session.timeStamp = Date.now()
     req.session.accessToken = res.req.user.accessToken
     req.session.refreshToken = res.req.user.refreshToken
     req.session.microsoftId = res.req.user.microsoftId
-
+    
     req.session.save(function(err) {
       err ? console.log('session saved') : console.log(err)
     })
 
+    
     res.redirect('/');
   }
 );

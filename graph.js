@@ -7,8 +7,11 @@ require('isomorphic-fetch');
 
 module.exports = {
   getUserDetails: async function(accessToken, userId) {
-    console.log('getUserDetails', userId)
-    const client = getAuthenticatedClient(accessToken);
+//console.log('getUserDetails', userId)
+    //const client = getAuthenticatedClient(accessToken);
+    if(!client){
+      client = await getAuthenticatedClient(accessToken);
+    }
 
     try {
       ///api call
@@ -30,9 +33,13 @@ module.exports = {
   },
 
   getAllGroups: async function getMyGroups(accessToken, userID) {
-    console.log('getAllGroups')
+//console.log('getAllGroups')
     try{
-      const client = await getAuthenticatedClient(accessToken);
+      //const client = await getAuthenticatedClient(accessToken);
+      if(!client){
+        client = await getAuthenticatedClient(accessToken);
+      }
+      
 
       return await client  
         .api(`/users/${userID}/transitiveMemberOf`)
@@ -48,9 +55,13 @@ module.exports = {
   },
 
   getAllPlanners: async function getPlanners(accessToken, groupID) {
-    console.log('getAllPlanners')
+//console.log('getAllPlanners')
     try{
-      const client = await getAuthenticatedClient(accessToken);
+      //const client = await getAuthenticatedClient(accessToken);
+      if(!client){
+        client = await getAuthenticatedClient(accessToken);
+      }
+      
 
       return await client
         .api(`/groups/${groupID}/planner/plans`)
@@ -60,16 +71,22 @@ module.exports = {
       if(error.code === 'InvalidAuthenticationToken'){
         //send error to caller
         throw error
-      }else{
+      }else if(error.statusCode === 403) {
+        console.log(error.body);
+      }
+      else{
         console.log(error);
       }
     }
   },
 
   getAllTasks: async function getTasks(accessToken, planID) {
-    console.log('getAllTasks')
+//console.log('getAllTasks')
     try{
-      const client = getAuthenticatedClient(accessToken);
+      //const client = getAuthenticatedClient(accessToken);
+      if(!client){
+        client = await getAuthenticatedClient(accessToken);
+      }
 
       return await client
         .api(`/planner/plans/${planID}/tasks`)
@@ -86,9 +103,12 @@ module.exports = {
   },
 
   getSingleTask: async function getTasks(accessToken, taskID) {
-    console.log('getSingleTask')
+//console.log('getSingleTask')
     try{
-      const client = getAuthenticatedClient(accessToken);
+      //const client = getAuthenticatedClient(accessToken);
+      if(!client){
+        client = await getAuthenticatedClient(accessToken);
+      }
 
       return await client
         .api(`planner/tasks/${taskID}`)
@@ -105,9 +125,12 @@ module.exports = {
   },
 
   getDetailedTask: async function getTasks(accessToken, taskID) {
-    console.log('getDetailedTask')
+//console.log('getDetailedTask')
     try{
-      const client = getAuthenticatedClient(accessToken);
+      //const client = getAuthenticatedClient(accessToken);
+      if(!client){
+        client = await getAuthenticatedClient(accessToken);
+      }
 
       return await client
         .api(`planner/tasks/${taskID}/details`)
@@ -124,9 +147,12 @@ module.exports = {
   },
 
   getTaskTitle: async function getTasks(accessToken, taskID) {
-    console.log('getTaskTitle')
+//console.log('getTaskTitle')
     try{
-      const client = getAuthenticatedClient(accessToken);
+      //const client = getAuthenticatedClient(accessToken);
+      if(!client){
+        client = await getAuthenticatedClient(accessToken);
+      }
 
       return await client
         .api(`planner/tasks/${taskID}`)
@@ -145,7 +171,8 @@ module.exports = {
 
 
   getUserPlanners: async function getUserPlanners(accessToken, userID) {
-    console.log('getUserPlanner')
+//console.log('getUserPlanner')
+ 
     let getUserGroups
     try {
       getUserGroups = await this.getAllGroups(accessToken, userID)
@@ -154,13 +181,13 @@ module.exports = {
       throw err
     }
 
-  console.log(getUserGroups)
+//  console.log(getUserGroups)
 
     let planners = []
   
     await Promise.all(getUserGroups.value.map(
       async (groupInfo) => {
-       console.log(groupInfo.displayName)
+//       console.log(groupInfo.displayName)
         if(groupInfo.displayName != 'Global Administrator'){
           try {
             const getPlanner  = await this.getAllPlanners(accessToken, groupInfo.id)
@@ -178,7 +205,7 @@ module.exports = {
   },
 
   searchAllPlanners: async function (accessToken, userID, searchTerm){
-    console.log('searchAllPlanners')
+//console.log('searchAllPlanners')
     try {
       const planners = await this.getUserPlanners(accessToken, userID)
       let plannerIDs = []
@@ -208,7 +235,7 @@ module.exports = {
 
 
       //find task
-      console.log('Searched for task')
+      //console.log('Searched for task')
 
       return plannerTasks.filter( taskInfo => taskInfo.title.toLowerCase().includes( searchTerm.toLowerCase() ) )
 
@@ -224,9 +251,13 @@ module.exports = {
   },
 
   createBucket: async function getMyGroups(accessToken, bucketName, planId) {
-    console.log('createBucket')
+//console.log('createBucket')
     try{
-      const client = getAuthenticatedClient(accessToken);
+      //const client = getAuthenticatedClient(accessToken);
+      if(!client){
+        client = await getAuthenticatedClient(accessToken);
+      }
+
       const plannerBucket = {
         name: bucketName,
         planId: planId,
@@ -247,9 +278,12 @@ module.exports = {
   },
 
   createTask: async function getMyGroups(accessToken, title, planId, bucketId, assignments = {}) {
-    console.log('createTask')
+//console.log('createTask')
     try{
-      const client = getAuthenticatedClient(accessToken);
+      //const client = getAuthenticatedClient(accessToken);
+      if(!client){
+        client = await getAuthenticatedClient(accessToken);
+      }
      
       const plannerTask = {
         planId: planId, 
@@ -273,9 +307,12 @@ module.exports = {
   },
 
   editTask: async function getMyGroups(accessToken, taskId) {
-    console.log('editTask')
+//console.log('editTask')
     try{
-      const client = getAuthenticatedClient(accessToken);
+      //const client = getAuthenticatedClient(accessToken);
+      if(!client){
+        client = await getAuthenticatedClient(accessToken);
+      }
      
       const plannerTask = {
         // 'Body': {
@@ -299,9 +336,12 @@ module.exports = {
   },
 
   createPlan: async function getMyGroups(accessToken, groupId, planTitle) {
-    console.log('createPlan') //doesn't work
+//console.log('createPlan') //doesn't work
     try{
-      const client = getAuthenticatedClient(accessToken);
+      //const client = getAuthenticatedClient(accessToken);
+      if(!client){
+        client = await getAuthenticatedClient(accessToken);
+      }
      
       const plannerTask = {
         owner: groupId,
@@ -323,9 +363,13 @@ module.exports = {
   },
 
   updateDetailedTask: async function getTasks(accessToken, taskID, currentEtag, checklistNames, description) {
-    console.log('getDetailedTask')
+//console.log('getDetailedTask')
     try{
-      const client = getAuthenticatedClient(accessToken);
+      //const client = getAuthenticatedClient(accessToken);
+      if(!client){
+        client = await getAuthenticatedClient(accessToken);
+      }
+
       let checklistItems = {
         checklist: {},
         description: description,
@@ -362,9 +406,12 @@ module.exports = {
 //Calendar--------------------------------------------------------------------------
 
   getEvents: async function getCalendarEvents(accessToken, userId){
-    console.log('getEvents')
+//console.log('getEvents')
     try{
-      const client = getAuthenticatedClient(accessToken);
+      //const client = getAuthenticatedClient(accessToken);
+      if(!client){
+        client = await getAuthenticatedClient(accessToken);
+      }
 
       return await client.api(`/me/calendarview?startdatetime=2021-08-19T21:20:29.145Z&enddatetime=2021-08-26T21:20:29.145Z`)
         .get();
@@ -378,19 +425,20 @@ module.exports = {
       }
     }
   },
-  
 }
 
+let client;
 
 function getAuthenticatedClient(accessToken) {
   // Initialize Graph client
+  
   const client = graph.Client.init({
     // Use the provided access token to authenticate requests
       authProvider: (done) => {
         done(null, accessToken);
       }
-
   });
+
   console.log('getAuthenticatedClient')
   return client
 }

@@ -1,6 +1,7 @@
 const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
+
 // const mongoose = require('mongoose')
-// const User = require('../models/User')
+const User = require('../models/User')
 
 module.exports = function (passport) {
   // Configure OIDC strategy
@@ -23,43 +24,37 @@ module.exports = function (passport) {
   // Callback function called once the sign-in is complete
   // and an access token has been obtained
   async function signInComplete(iss, sub, profile, accessToken, refreshToken, params, done) {
-    console.log(profile)
-    //console.log(accessToken)
     if (!profile.oid) {
       return done(new Error("No OID found in user profile."), null);
     }
 
-      // const newUser = {
-      //   microsoftId: profile.oid,
-      //   displayName: profile.displayName,
-      // }
-
       try {
         const ObjectID = require('mongodb').ObjectId;
         
-        let user = {
+        let newUser = {
           _id: new ObjectID(),
           microsoftId: profile.oid,
           displayName: profile.displayName,
         }
-      //   let user = await User.findOne( { microsoftId: profile.oid })
+        //console.log(profile, accessToken, refreshToken)
+        let user = await User.findOne( { microsoftId: newUser.microsoftId })
 
-      //   if (user) {
-      //      console.log('user found')
+        if (user) {
+           console.log('user found')
 
           user.accessToken = accessToken
           user.refreshToken = refreshToken
-
-          done(null, user)
-        // } else {
-        //   user = await User.create(newUser)
-
-        //   user.accessToken = accessToken
-        //   user.refreshToken = refreshToken
           
-        //   console.log('created user')
-        //   done(null, user)
-        // }
+          done(null, user)
+        } else {
+          user = await User.create(newUser)
+
+          user.accessToken = accessToken
+          user.refreshToken = refreshToken
+          
+          console.log('created user')
+          done(null, user)
+        }
 
       } catch (err) {
         console.error(err)

@@ -1,91 +1,27 @@
 //const ewsOptions = require('../ewsConnections')
 const graph = require('../graph')
-
+const Settings = require('../models/Settings')
 module.exports = { 
     index: async (req,res)=>{
         try{
             if(!req.session.accessToken){
-                res.render('index.ejs', { 
+                return res.render('index.ejs', { 
                     planners: undefined,
                 })
             }
-            
-            //gets all the planners belonging to a user
-            let plans = await graph.getUserPlanners(req.session.accessToken, req.session.microsoftId)
-
-            //grabs all the tasks from a given planner
-            const tasks = await graph.getAllTasks(req.session.accessToken, plans[0].planner[0].id)
-    //console.log(tasks) //test to make sure it is grabbing the task and they are correct
-
-            
-            
-            //filter the tasks by date
-            let selectedDate = new Date('March 01, 2022')
-    //console.log(selectedDate)
-            const tasklist = []
-            tasks.value.forEach(item => {
-                let currentDate = new Date(item.startDateTime)
-                currentDate = new Date(`${currentDate.getMonth()} ${currentDate.getDate()}, ${currentDate.getFullYear()}`)
-                
-                if(currentDate.getTime() < selectedDate.getTime()){
-                    tasklist.push(item)
+            let plans;
+            const savedSettings = await Settings.findOne({ microsoftId: req.session.microsoftId })
+            if(savedSettings){
+                console.log(savedSettings)
+                plans = {
+                    planName: savedSettings.plannerName, 
+                    planId: savedSettings.plannerId
                 }
-            })
-    //console.log(tasklist) //test to see that the tasks were filtered by date displayed
-            
-            //creates a list of unique names from the tasks, these tasks need to have a specific format which is: name - string
-            let namelist = []
-            const masterList = []
-            //use namelist as a reference to the master list
-            tasklist.forEach(item => {
-                let currentName = item.title.split('-')[0].trim()
-                let startDate = new Date(item.startDateTime)
-                let endDate = new Date(startDate.setFullYear(startDate.getFullYear() + 1))
-                endDate = new Date(endDate.setDate(endDate.getDate() - 1))
-                
-
-                if(!namelist.includes(currentName)){
-                    namelist.push(currentName)
-                    masterList.push({
-                        name: currentName,
-                        tenant: [
-                            {
-                                taskId: item.id,
-                                documentList: [],
-                                contractTerm: [startDate,  endDate]
-                            },
-
-                        ]
-                    })
-                }else{
-                    masterList[namelist.indexOf(currentName)].tenant.push({
-                        taskId: item.id,
-                        documentList: [],
-                        contractTerm: [startDate,  endDate]
-                    })
-                }
-            })
-
-    //console.log(namelist) //test to see that the list is displaying properly
-    //console.log(masterList)
-
-            //select specific task to grab details
-            for(items of masterList){
-                for(items2 of items.tenant){
-                    let currentItem = await graph.getDetailedTask(req.session.accessToken, items2.taskId)
-            //console.log(currentItem)
-                    items2.name = currentItem.description.split(":")[1].trim()
-            //console.log(items2)
-                    for(item3 in currentItem.checklist){
-                        items2.documentList.push(currentItem.checklist[item3].title)
-            //console.log("tt:", currentItem.checklist[item3].title)
-                    }
-                }
+            }else{
+                plans = await graph.getUserPlanners(req.session.accessToken, req.session.microsoftId) //gets all the planners belonging to a user
             }
-            //await graph.getDetailedTask(req.session.accessToken, taskId)
-            console.log(masterList[0].tenant)
 
-
+            console.log(typeof plans, plans)
             res.render('index.ejs', { 
                 planners: plans ? plans[0] : undefined,
             })
@@ -102,7 +38,6 @@ module.exports = {
               }else{
                 console.log("main error:", err); // TypeError: failed to fetch
               }
-            
         }
     },
 
@@ -124,7 +59,7 @@ module.exports = {
             
             
             //filter the tasks by date
-            let selectedDate = new Date('March 01, 2022')
+            let selectedDate = new Date('June 01, 2024')
     //console.log(selectedDate)
             const tasklist = []
             tasks.value.forEach(item => {
@@ -187,7 +122,7 @@ module.exports = {
                 }
             }
             //await graph.getDetailedTask(req.session.accessToken, taskId)
-            console.log(masterList[0].tenant)
+//            console.log(masterList[0].tenant)
 
 
             res.render('letter.ejs', { 
