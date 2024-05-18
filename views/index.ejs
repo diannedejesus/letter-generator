@@ -18,22 +18,28 @@
             
             <h3>Letter Templates</h3>
 
-            <h3>Planner</h3>            
-                
-            <% if (typeof planners === 'undefined'){ %> 
+            <h3>Planner</h3>          
+            <% if (typeof planners === 'undefined' && typeof settings === 'undefined'){ %> 
 
                 <a href="/auth/signin" class="">Sign in</a>
 
-            <% } else { %> 
+            <% } else if(typeof settings === 'undefined') { %> 
 
                 <label>Select a Planner</label>
-                <select>
-                    <option>Select One</option>
-                    <% for(plans of planners.planner) { %> 
-                    <option value="<%= plans.id %>"><%= plans.title %></option>
-                    <% } %>
-                </select>
-
+                <form action="../setPlan" method="POST">
+                    <select name="plan">
+                        <option>Select One</option>
+                        <% for(plans of planners.planner) { %> 
+                        <option value='{"planId":"<%=plans.id%>", "planName":"<%=plans.title%>"}'><%= plans.title %></option>
+                        <% } %>
+                    </select>
+                    <input type="submit" />
+                </form>
+            <% } else { %>
+                <p>The selected plan is:</p> 
+                <%= settings.planName %>
+                <p>The uncompleted tasks are:</p>
+                
            <% } %>
 
             <h3>Exchange Login</h3>

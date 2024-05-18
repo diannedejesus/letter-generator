@@ -1,29 +1,59 @@
 //const ewsOptions = require('../ewsConnections')
 const graph = require('../graph')
 const Settings = require('../models/Settings')
+
 module.exports = { 
-    index: async (req,res)=>{
+    index: async (req, res)=>{
         try{
             if(!req.session.accessToken){
                 return res.render('index.ejs', { 
                     planners: undefined,
+                    settings: undefined
                 })
             }
-            let plans;
+
+            let selectedPlan, plans
             const savedSettings = await Settings.findOne({ microsoftId: req.session.microsoftId })
+            //console.log(req.session)
             if(savedSettings){
-                console.log(savedSettings)
-                plans = {
+                //console.log(savedSettings)
+                selectedPlan = {
                     planName: savedSettings.plannerName, 
                     planId: savedSettings.plannerId
                 }
+
+                const task = await graph.getAllTasks(req.session.accessToken, savedSettings.plannerId)
+                const task2 = task.value.filter(currentTask => currentTask.completedDateTime === null)
+                const task3 = []
+                for(const currentTask of task2){
+                    task3.push({
+                        id: currentTask.id,
+                        title: currentTask.title
+                    })
+                }
+                
+                for(const currentTask of task3){
+                    const taskDetails = await graph.getDetailedTask(req.session.accessToken, currentTask.id)
+                    currentTask.description = taskDetails.description
+                    currentTask.checklist = []
+
+                    for(const checklistitem in taskDetails.checklist){
+                        //console.log(taskDetails.checklist[checklistitem])
+                        if(taskDetails.checklist[checklistitem].isChecked === false){
+                            currentTask.checklist.push(taskDetails.checklist[checklistitem].title)
+                        }
+                    }
+                }
+
+
             }else{
                 plans = await graph.getUserPlanners(req.session.accessToken, req.session.microsoftId) //gets all the planners belonging to a user
             }
 
-            console.log(typeof plans, plans)
             res.render('index.ejs', { 
                 planners: plans ? plans[0] : undefined,
+                settings: selectedPlan ? selectedPlan : undefined,
+                tasks: task3 ? task3 : undefined
             })
 
         }catch(err){
@@ -33,15 +63,55 @@ module.exports = {
 
                 res.render('index.ejs', { 
                     planners: undefined,
+                    settings: undefined,
                     errors: "You need to Sign in to your 365 Account"
                 })
-              }else{
+            }else{
                 console.log("main error:", err); // TypeError: failed to fetch
-              }
+            }
         }
     },
 
-    generateLetters: async (req,res)=>{
+    setPlan: async (req, res)=>{
+        try {
+            if(!req.body || !req.body.plan){
+                console.log("No values found.")
+                res.redirect('/')
+            }else{
+                const savedSettings = await Settings.findOne({ microsoftId: req.session.microsoftId })
+                const plan = JSON.parse(req.body.plan)
+                if(!savedSettings){
+                    const setSettings = {
+                        microsoftId: req.session.microsoftId,
+                        plannerId: plan.planId,
+                        plannerName: plan.planName,
+                    }
+
+                    const createdSetting = await Settings.create(setSettings)
+
+                    if(createdSetting){
+                        res.status(201)
+                        res.redirect('/')
+                    }else{
+                        res.redirect('/')
+                    }
+
+                    
+                    //page status code
+                }else{
+                    console.log("Settings for this user already exist, did you want to update the current settings?")
+                }
+                
+            }
+            
+
+        } catch (error) {
+            console.log(error)
+        }
+        
+    },
+
+    generateLetters: async (req, res)=>{
         try {
             if(!req.session.accessToken){
                 res.render('index.ejs', { 
