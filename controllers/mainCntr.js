@@ -13,34 +13,27 @@ module.exports = {
             }
 
             let selectedPlan, plans
+            let task3
             const savedSettings = await Settings.findOne({ microsoftId: req.session.microsoftId })
-            //console.log(req.session)
+
             if(savedSettings){
-                //console.log(savedSettings)
                 selectedPlan = {
                     planName: savedSettings.plannerName, 
                     planId: savedSettings.plannerId
                 }
 
-                const task = await graph.getAllTasks(req.session.accessToken, savedSettings.plannerId)
-                const task2 = task.value.filter(currentTask => currentTask.completedDateTime === null)
-                const task3 = []
-                for(const currentTask of task2){
-                    task3.push({
-                        id: currentTask.id,
-                        title: currentTask.title
-                    })
-                }
+                let taskList = await graph.getAllTasks(req.session.accessToken, savedSettings.plannerId)
+                taskList = removeCompletedTasks(taskList.value)
+                filteredTaskList = getIdTitle(taskList)
                 
-                for(const currentTask of task3){
+                for(const currentTask of filteredTaskList){
                     const taskDetails = await graph.getDetailedTask(req.session.accessToken, currentTask.id)
                     currentTask.description = taskDetails.description
                     currentTask.checklist = []
 
                     for(const checklistitem in taskDetails.checklist){
-                        //console.log(taskDetails.checklist[checklistitem])
                         if(taskDetails.checklist[checklistitem].isChecked === false){
-                            currentTask.checklist.push(taskDetails.checklist[checklistitem].title)
+                            currentTask.checklist.push(taskDetails.checklist[checklistitem].title.toLowerCase().trim())
                         }
                     }
                 }
@@ -53,7 +46,7 @@ module.exports = {
             res.render('index.ejs', { 
                 planners: plans ? plans[0] : undefined,
                 settings: selectedPlan ? selectedPlan : undefined,
-                tasks: task3 ? task3 : undefined
+                tasks: filteredTaskList ? filteredTaskList : undefined
             })
 
         }catch(err){
@@ -119,88 +112,57 @@ module.exports = {
                 })
             }
             
-            //gets all the planners belonging to a user
-            let plans = await graph.getUserPlanners(req.session.accessToken, req.session.microsoftId)
+            let selectedTasks = []
+            //get task info
+            for(const currentId of req.body.selectedTasks){
+                const currentTask = await graph.getSingleTask(req.session.accessToken, currentId)
+                selectedTasks.push({
+                    id: currentTask.id,
+                    title: currentTask.title,
+                    dueDateTime: currentTask.dueDateTime,
+                    contractTerm: new Date(Date.now()),
+                })
+            }
 
-            //grabs all the tasks from a given planner
-            const tasks = await graph.getAllTasks(req.session.accessToken, plans[0].planner[0].id)
-    //console.log(tasks) //test to make sure it is grabbing the task and they are correct
+            //get taskdetails
+            for(const currentTask of selectedTasks){
+                const taskDetails = await graph.getDetailedTask(req.session.accessToken, currentTask.id)
+                currentTask.description = taskDetails.description.split(":")[1].trim()
+                currentTask.checklist = []
 
-            
-            
-            //filter the tasks by date
-            let selectedDate = new Date('June 01, 2024')
-    //console.log(selectedDate)
-            const tasklist = []
-            tasks.value.forEach(item => {
-                let currentDate = new Date(item.startDateTime)
-                currentDate = new Date(`${currentDate.getMonth()} ${currentDate.getDate()}, ${currentDate.getFullYear()}`)
-                
-                if(currentDate.getTime() < selectedDate.getTime()){
-                    tasklist.push(item)
-                }
-            })
-    //console.log(tasklist) //test to see that the tasks were filtered by date displayed
-            
-            //creates a list of unique names from the tasks, these tasks need to have a specific format which is: name - string
-            let namelist = []
-            const masterList = []
-            //use namelist as a reference to the master list
-            tasklist.forEach(item => {
-                let currentName = item.title.split('-')[0].trim()
-                let startDate = new Date(item.startDateTime)
-                let endDate = new Date(startDate.setFullYear(startDate.getFullYear() + 1))
-                endDate = new Date(endDate.setDate(endDate.getDate() - 1))
-                
-
-                if(!namelist.includes(currentName)){
-                    namelist.push(currentName)
-                    masterList.push({
-                        name: currentName,
-                        tenant: [
-                            {
-                                taskId: item.id,
-                                documentList: [],
-                                contractTerm: [startDate,  endDate]
-                            },
-
-                        ]
-                    })
-                }else{
-                    masterList[namelist.indexOf(currentName)].tenant.push({
-                        taskId: item.id,
-                        documentList: [],
-                        contractTerm: [startDate,  endDate]
-                    })
-                }
-            })
-
-    //console.log(namelist) //test to see that the list is displaying properly
-    //console.log(masterList)
-
-            //select specific task to grab details
-            for(items of masterList){
-                for(items2 of items.tenant){
-                    let currentItem = await graph.getDetailedTask(req.session.accessToken, items2.taskId)
-            //console.log(currentItem)
-                    items2.name = currentItem.description.split(":")[1].trim()
-            //console.log(items2)
-                    for(item3 in currentItem.checklist){
-                        items2.documentList.push(currentItem.checklist[item3].title.trim().toLowerCase())
-            //console.log("tt:", currentItem.checklist[item3].title)
+                for(const checklistitem in taskDetails.checklist){
+                    if(taskDetails.checklist[checklistitem].isChecked === false){
+                        currentTask.checklist.push(taskDetails.checklist[checklistitem].title.toLowerCase().trim())
                     }
                 }
             }
-            //await graph.getDetailedTask(req.session.accessToken, taskId)
-//            console.log(masterList[0].tenant)
 
+            //console.log(selectedTasks)
 
             res.render('letter.ejs', { 
-                list: masterList ? masterList : undefined,
+                list: selectedTasks ? selectedTasks : undefined,
             })
             
         } catch (error) {
             console.log(error)
         }
     },
-}    
+}
+
+//############################################################################################
+function removeCompletedTasks(taskList){
+    return taskList.filter(currentTask => currentTask.completedDateTime === null)
+}
+
+function getIdTitle(taskList){
+    const newList = []
+
+    for(const currentTask of taskList){
+        newList.push({
+            id: currentTask.id,
+            title: currentTask.title
+        })
+    }
+
+    return newList
+}

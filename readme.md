@@ -1,7 +1,5 @@
 # Planner-to-Letter
 
-**Built by Dianne De Jesus; No current reviewers**
-
 ## Description
 
 Select a planner and generate a letter for each tasked based on the information contained in each one.

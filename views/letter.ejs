@@ -23,7 +23,7 @@
         <% }else{ %>
             <% list.forEach( items => { %> 
                 <address>
-                    <%= items.name %><br>
+                    <%= items.title %><br>
                     street<br>
                     city, state zipcode
                 </address>
@@ -31,42 +31,41 @@
                 <p><%= new Date(date).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></p>
     
                 <h1>RE: Incumplimiento de documentaci&oacute;n requerida</h1>
+                <p>Participant Name: <%= items.description %></p>
+                <p>Vencido desde: <%= items.contractTerm.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></p>
+                       
                 
-                <% for(tenants of items.tenant){ %> 
-                    <% if(tenants.documentList.includes('hacienda') || tenants.documentList.includes('patente') || tenants.documentList.includes('crim')) { %>
+                    <% if(items.checklist.includes('hacienda') || items.checklist.includes('patente') || items.checklist.includes('crim')) { %>
                     <section class="letterBody">
-                        <p>Participant Name: <%= tenants.name %></p>
-                        <p>Vencido desde: <%= tenants.contractTerm[0].toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></p>
-                        
                         <h2>Certificaci&oacute;n Negativa o evidencia de cumplimiento:</h2>
                         <ul>
-                            <% if(tenants.documentList.includes('hacienda')) { %>
+                            <% if(items.checklist.includes('hacienda')) { %>
                                 <li>Departamento de Hacienda (https://suri.hacienda.pr.gov)</li>
                             <% } %>
-                            <% if(tenants.documentList.includes('patente')) { %>
+                            <% if(items.checklist.includes('patente')) { %>
                                 <li>Certificaci&oacute;n de Patente del Municipio de Gurabo (787-737-0046)</li>
                             <% } %>
-                            <% if(tenants.documentList.includes('crim')) { %>
+                            <% if(items.checklist.includes('crim')) { %>
                                 <li>CRIM de la vivienda alquilada (https://emueble.crimpr.net)</li>
                             <% } %>
                         </ul>
                     <% } %>
-                    <% if(tenants.documentList.includes('hap') || tenants.documentList.includes('contrato')) { %>
+                    <% if(items.checklist.includes('hap') || items.checklist.includes('contrato')) { %>
                         <h2>Documentos Additionales:</h2>
                         <ul>
-                            <% if(tenants.documentList.includes('contrato')) { %>
-                                <li>Contrato de Arrendamiento entre arrendAdor y participante
+                            <% if(items.checklist.includes('contrato')) { %>
+                                <li>Contrato de arrendamiento entre arrendador y participante
                                     <ul>
-                                        <li>T&eacute;rmino del contrato: <%= tenants.contractTerm[0].toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %> al <%= items.tenant[0].contractTerm[1].toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></li>
+                                        <li>T&eacute;rmino del contrato: <%= items.contractTerm.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) %> al <%= items.contractTerm.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) %></li>
                                     </ul>
                                 </li>
                             <% } %>
-                            <% if(tenants.documentList.includes('hap')) { %>
+                            <% if(items.checklist.includes('hap')) { %>
                                 <li>Firmar Contrato HAP</li>
                             <% } %>
                         </ul>
                     <% } %> 
-                <% } %> 
+                 
                 </section>
     
                 <section class="signature">
@@ -78,6 +77,7 @@
                 <p>This company name</p>
                 <p>our address city, st 000###</p>
             </footer>
+            <div class="pagebreak"> </div>
         <% }) %>
         <% } %>
     </main>

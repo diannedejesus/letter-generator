@@ -38,8 +38,16 @@
             <% } else { %>
                 <p>The selected plan is:</p> 
                 <%= settings.planName %>
+
+                <% if(typeof tasks !== 'undefined'){ %> 
                 <p>The uncompleted tasks are:</p>
-                
+                <form action="../generateLetters" method="POST">
+                    <% tasks.forEach(element => { %>
+                        <p><input name="selectedTasks" type="checkbox" value="<%= element.id %>" /> <%= element.title %> || <%= element.description %> || <%= element.checklist %></p>
+                    <% }); %>
+                    <input type="submit" />
+                </form>
+                <% } %>
            <% } %>
 
             <h3>Exchange Login</h3>
