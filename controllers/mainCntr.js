@@ -127,7 +127,7 @@ module.exports = {
             //get taskdetails
             for(const currentTask of selectedTasks){
                 const taskDetails = await graph.getDetailedTask(req.session.accessToken, currentTask.id)
-                currentTask.description = taskDetails.description.split(":")[1].trim()
+                currentTask.description = taskDetails.description.split("Tenant:")[1].trim()
                 currentTask.checklist = []
 
                 for(const checklistitem in taskDetails.checklist){

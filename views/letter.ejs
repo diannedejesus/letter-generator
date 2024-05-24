@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="../../css/style.css">
 </head>
 <body>
-    <section class="letterHeader noprint">
+    <section class="letterHeader menuHeader">
         <h1>Letter Model</h1>
         <ul><li><a href="javascript:if(window.print)window.print()">Print</a></li><li><a href="">Send as email</a></li></ul>
         <% if (typeof messages !== 'undefined'){ %> 
@@ -21,7 +21,7 @@
             <p>Something went wrong, click back and try again.</p>
         </section>
         <% }else{ %>
-            <% list.forEach( items => { %> 
+            <% list.forEach( (items, index) => { %> 
                 <address>
                     <%= items.title %><br>
                     street<br>
@@ -77,7 +77,10 @@
                 <p>This company name</p>
                 <p>our address city, st 000###</p>
             </footer>
-            <div class="pagebreak"> </div>
+
+            <% if(list.length-1 > index) { %>
+                <div class="pagebreak"> </div>
+            <% } %>
         <% }) %>
         <% } %>
     </main>
