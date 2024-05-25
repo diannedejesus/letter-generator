@@ -107,23 +107,14 @@ module.exports = {
             if(!req.session.accessToken){
                 res.render('index.ejs', { 
                     planners: undefined,
+                    errors: "You need to Sign in to your 365 Account"
                 })
             }
             
             let selectedTasks = []
-            //get task info
-            for(const currentId of req.body.selectedTasks){
-                const currentTask = await graph.getSingleTask(req.session.accessToken, currentId)
-                selectedTasks.push({
-                    id: currentTask.id,
-                    title: currentTask.title,
-                    dueDateTime: currentTask.dueDateTime,
-                    contractTerm: new Date(Date.now()),
-                })
-            }
-
-            //get taskdetails
-            for(const currentTask of selectedTasks){
+            
+            if(typeof req.body.selectedTasks === "string"){
+                const currentTask = await graph.getSingleTask(req.session.accessToken, req.body.selectedTasks)
                 const taskDetails = await graph.getDetailedTask(req.session.accessToken, currentTask.id)
                 currentTask.description = taskDetails.description.split("Tenant:")[1].trim()
                 currentTask.checklist = []
@@ -133,9 +124,40 @@ module.exports = {
                         currentTask.checklist.push(taskDetails.checklist[checklistitem].title.toLowerCase().trim())
                     }
                 }
-            }
 
-            //console.log(selectedTasks)
+                selectedTasks.push({
+                    id: currentTask.id,
+                    title: currentTask.title,
+                    dueDateTime: currentTask.dueDateTime,
+                    contractTerm: new Date(Date.now()),
+                    checklist: currentTask.checklist,
+                })
+            }else{
+                //get task info
+                for(const currentId of req.body.selectedTasks){
+                    const currentTask = await graph.getSingleTask(req.session.accessToken, currentId)
+                    selectedTasks.push({
+                        id: currentTask.id,
+                        title: currentTask.title,
+                        dueDateTime: currentTask.dueDateTime,
+                        contractTerm: new Date(Date.now()),
+                    })
+                }
+
+                //get taskdetails
+                for(const currentTask of selectedTasks){
+                    const taskDetails = await graph.getDetailedTask(req.session.accessToken, currentTask.id)
+                    currentTask.description = taskDetails.description.split("Tenant:")[1].trim()
+                    currentTask.checklist = []
+
+                    for(const checklistitem in taskDetails.checklist){
+                        if(taskDetails.checklist[checklistitem].isChecked === false){
+                            currentTask.checklist.push(taskDetails.checklist[checklistitem].title.toLowerCase().trim())
+                        }
+                    }
+                }
+            }
+            
 
             res.render('letter.ejs', { 
                 list: selectedTasks ? selectedTasks : undefined,
