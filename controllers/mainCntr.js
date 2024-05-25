@@ -8,12 +8,12 @@ module.exports = {
             if(!req.session.accessToken){
                 return res.render('index.ejs', { 
                     planners: undefined,
-                    settings: undefined
+                    settings: undefined,
+                    errors: "You need to Sign in to your 365 Account"
                 })
             }
 
             let selectedPlan, plans
-            let task3
             const savedSettings = await Settings.findOne({ microsoftId: req.session.microsoftId })
 
             if(savedSettings){
@@ -37,8 +37,6 @@ module.exports = {
                         }
                     }
                 }
-
-
             }else{
                 plans = await graph.getUserPlanners(req.session.accessToken, req.session.microsoftId) //gets all the planners belonging to a user
             }

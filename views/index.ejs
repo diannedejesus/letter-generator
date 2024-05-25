@@ -10,54 +10,47 @@
 </head>
 <body>
     <main class='signin clearfix'>
-        <section class='logon'>
-            <% if (typeof errors !== 'undefined'){ %> 
+        <ul>
+            <li>Letter Templates</li>
+            <li>Set Planner</li>
+            <li>Configure Exchange</li>
+        </ul>
+        <% if (typeof errors !== 'undefined'){ %>
+            <% if (typeof planners === 'undefined'){ %> 
+                <p class='message'><%= errors %></p>
+                <a href="/auth/signin" class="">Sign in</a>
+            <% }else { %>
                 <p class='message'><%= errors %></p>
             <% } %>
-            <h2>Select from the following options:</h2>
-            
-            <h3>Letter Templates</h3>
-
-            <h3>Planner</h3>          
-            <% if (typeof planners === 'undefined' && typeof settings === 'undefined'){ %> 
-
-                <a href="/auth/signin" class="">Sign in</a>
-
-            <% } else if(typeof settings === 'undefined') { %> 
-
-                <label>Select a Planner</label>
-                <form action="../setPlan" method="POST">
-                    <select name="plan">
-                        <option>Select One</option>
-                        <% for(plans of planners.planner) { %> 
-                        <option value='{"planId":"<%=plans.id%>", "planName":"<%=plans.title%>"}'><%= plans.title %></option>
-                        <% } %>
-                    </select>
-                    <input type="submit" />
-                </form>
-            <% } else { %>
-                <p>The selected plan is:</p> 
-                <%= settings.planName %>
-
-                <% if(typeof tasks !== 'undefined'){ %> 
-                <p>The uncompleted tasks are:</p>
-                <form action="../generateLetters" method="POST">
-                    <% tasks.forEach(element => { %>
-                        <p><input name="selectedTasks" type="checkbox" value="<%= element.id %>" /> <%= element.title %> || <%= element.description %> || <%= element.checklist %></p>
-                    <% }); %>
-                    <input type="submit" />
-                </form>
-                <% } %>
-           <% } %>
-
-            <h3>Exchange Login</h3>
-            <form class="login-form" action="../login" method="POST">
-                <input type="text" name='email' placeholder="email">
-                <input type="password" name='password' placeholder="password">
-                <input type="submit" value='Test'>
-            </form>
+        <% } else { %>
+            <section class='logon'>    
+                <% if(typeof settings === 'undefined' && typeof planners !== 'undefined') { %> 
+                    <h3>Planner</h3>     
+                    <label>Select a Planner</label>
+                    <form action="../setPlan" method="POST">
+                        <select name="plan">
+                            <option>Select One</option>
+                            <% for(plans of planners.planner) { %> 
+                            <option value='{"planId":"<%=plans.id%>", "planName":"<%=plans.title%>"}'><%= plans.title %></option>
+                            <% } %>
+                        </select>
+                        <input type="submit" />
+                    </form>
+                <% } else { %>
+                    <p>The selected plan is: <%= settings.planName %></p> 
+                    
+                    <% if(typeof tasks !== 'undefined'){ %> 
+                        <p>The uncompleted tasks are:</p>
+                        <form action="../generateLetters" method="POST">
+                            <% tasks.forEach(element => { %>
+                                <p><input name="selectedTasks" type="checkbox" value="<%= element.id %>" /> <%= element.title %> || <%= element.description %> || <%= element.checklist %></p>
+                            <% }); %>
+                            <input type="submit" />
+                        </form>
+                    <% } %>
+            <% } %>
+        <% } %>
         </section>
-
     </main>
 </body>
 </html>
