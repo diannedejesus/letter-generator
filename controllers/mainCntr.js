@@ -13,16 +13,22 @@ module.exports = {
                 })
             }
 
-            let selectedPlan, plans
-            const savedSettings = await Settings.findOne({ microsoftId: req.session.microsoftId })
+            let plans, filteredTaskList
 
-            if(savedSettings){
-                selectedPlan = {
-                    planName: savedSettings.plannerName, 
-                    planId: savedSettings.plannerId
+            if(!req.session.planner){
+                console.log("yes")
+                const settings = await Settings.findOne({ microsoftId: req.session.microsoftId })
+
+                if(settings){
+                    req.session.planner = {
+                        planName: settings.plannerName,
+                        planId: settings.plannerId
+                    }
+                }else{
+                    plans = await graph.getUserPlanners(req.session.accessToken, req.session.microsoftId)
                 }
-
-                let taskList = await graph.getAllTasks(req.session.accessToken, savedSettings.plannerId)
+            }else{
+                let taskList = await graph.getAllTasks(req.session.accessToken, req.session.planner.planId)
                 taskList = removeCompletedTasks(taskList.value)
                 filteredTaskList = getIdTitle(taskList)
                 
@@ -37,13 +43,11 @@ module.exports = {
                         }
                     }
                 }
-            }else{
-                plans = await graph.getUserPlanners(req.session.accessToken, req.session.microsoftId) //gets all the planners belonging to a user
             }
 
             res.render('index.ejs', { 
                 planners: plans ? plans[0] : undefined,
-                settings: selectedPlan ? selectedPlan : undefined,
+                settings: req.session.planner ? req.session.planner : undefined,
                 tasks: filteredTaskList ? filteredTaskList : undefined
             })
 
@@ -87,7 +91,6 @@ module.exports = {
                         res.redirect('/')
                     }
 
-                    
                     //page status code
                 }else{
                     console.log("Settings for this user already exist, did you want to update the current settings?")
@@ -116,7 +119,8 @@ module.exports = {
             if(typeof req.body.selectedTasks === "string"){
                 const currentTask = await graph.getSingleTask(req.session.accessToken, req.body.selectedTasks)
                 const taskDetails = await graph.getDetailedTask(req.session.accessToken, currentTask.id)
-                currentTask.description = taskDetails.description.split("Tenant:")[1].trim()
+                const tenantName = taskDetails.description.split("Tenant:")[1].trim()
+                currentTask.description = tenantName.substring(0, tenantName.indexOf('\r\n'))
                 currentTask.checklist = []
 
                 for(const checklistitem in taskDetails.checklist){
@@ -128,8 +132,9 @@ module.exports = {
                 selectedTasks.push({
                     id: currentTask.id,
                     title: currentTask.title,
+                    description: currentTask.description,
                     dueDateTime: currentTask.dueDateTime,
-                    contractTerm: new Date(Date.now()),
+                    contractTerm: new Date(`01 ${taskDetails.description.toLowerCase().split("revision:")[1].trim()}`),
                     checklist: currentTask.checklist,
                 })
             }else{
@@ -140,15 +145,16 @@ module.exports = {
                         id: currentTask.id,
                         title: currentTask.title,
                         dueDateTime: currentTask.dueDateTime,
-                        contractTerm: new Date(Date.now()),
                     })
                 }
 
                 //get taskdetails
                 for(const currentTask of selectedTasks){
                     const taskDetails = await graph.getDetailedTask(req.session.accessToken, currentTask.id)
-                    currentTask.description = taskDetails.description.split("Tenant:")[1].trim()
+                    const tenantName = taskDetails.description.split("Tenant:")[1].trim()
+                    currentTask.description = tenantName.substring(0, tenantName.indexOf('\r\n'))
                     currentTask.checklist = []
+                    currentTask.contractTerm = new Date(`01 ${taskDetails.description.toLowerCase().split("revision:")[1].trim()}`)
 
                     for(const checklistitem in taskDetails.checklist){
                         if(taskDetails.checklist[checklistitem].isChecked === false){

@@ -30,14 +30,14 @@
                 <% let date = Date.now() %>
                 <p><%= new Date(date).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></p>
     
-                <h1>RE: Incumplimiento de documentaci&oacute;n requerida</h1>
+                <h2>RE: Incumplimiento de documentaci&oacute;n requerida</h2>
                 <p>Participant Name: <%= items.description %></p>
                 <p>Vencido desde: <%= items.contractTerm.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></p>
                        
                 
                     <% if(items.checklist.includes('hacienda') || items.checklist.includes('patente') || items.checklist.includes('crim')) { %>
                     <section class="letterBody">
-                        <h2>Certificaci&oacute;n Negativa o evidencia de cumplimiento:</h2>
+                        <h3>Certificaci&oacute;n Negativa o evidencia de cumplimiento:</h3>
                         <ul>
                             <% if(items.checklist.includes('hacienda')) { %>
                                 <li>Departamento de Hacienda (https://suri.hacienda.pr.gov)</li>
@@ -51,7 +51,7 @@
                         </ul>
                     <% } %>
                     <% if(items.checklist.includes('hap') || items.checklist.includes('contrato')) { %>
-                        <h2>Documentos Additionales:</h2>
+                        <h3>Documentos Additionales:</h3>
                         <ul>
                             <% if(items.checklist.includes('contrato')) { %>
                                 <li>Contrato de arrendamiento entre arrendador y participante
