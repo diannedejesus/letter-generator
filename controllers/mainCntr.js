@@ -13,10 +13,9 @@ module.exports = {
                 })
             }
 
-            let plans, filteredTaskList
+            let plans, taskList
 
             if(!req.session.planner){
-                console.log("yes")
                 const settings = await Settings.findOne({ microsoftId: req.session.microsoftId })
 
                 if(settings){
@@ -28,27 +27,26 @@ module.exports = {
                     plans = await graph.getUserPlanners(req.session.accessToken, req.session.microsoftId)
                 }
             }else{
-                let taskList = await graph.getAllTasks(req.session.accessToken, req.session.planner.planId)
+                taskList = await graph.getAllTasks(req.session.accessToken, req.session.planner.planId)
                 taskList = removeCompletedTasks(taskList.value)
-                filteredTaskList = getIdTitle(taskList)
-                
-                for(const currentTask of filteredTaskList){
-                    const taskDetails = await graph.getDetailedTask(req.session.accessToken, currentTask.id)
-                    currentTask.description = taskDetails.description
-                    currentTask.checklist = []
+                taskList = taskList.map(task => retrieveIdTitle(task))
 
-                    for(const checklistitem in taskDetails.checklist){
-                        if(taskDetails.checklist[checklistitem].isChecked === false){
-                            currentTask.checklist.push(taskDetails.checklist[checklistitem].title.toLowerCase().trim())
-                        }
-                    }
+                for(let i=0; i<taskList.length; i++){
+                    const taskDetails = await graph.getDetailedTask(req.session.accessToken, taskList[i].id)
+                    const theDetails = retrieveDetails(taskDetails)
+
+                    taskList[i] = {...taskList[i], ...theDetails}
                 }
+
+                req.session.tasks = taskList
             }
+
+            //console.log(req.session.tasks)
 
             res.render('index.ejs', { 
                 planners: plans ? plans[0] : undefined,
                 settings: req.session.planner ? req.session.planner : undefined,
-                tasks: filteredTaskList ? filteredTaskList : undefined
+                tasks: taskList ? taskList : undefined
             })
 
         }catch(err){
@@ -107,6 +105,8 @@ module.exports = {
 
     generateLetters: async (req, res)=>{
         try {
+            console.log(req.session.tasks)
+            
             if(!req.session.accessToken){
                 res.render('index.ejs', { 
                     planners: undefined,
@@ -180,15 +180,28 @@ function removeCompletedTasks(taskList){
     return taskList.filter(currentTask => currentTask.completedDateTime === null)
 }
 
-function getIdTitle(taskList){
-    const newList = []
+function retrieveIdTitle(task){
+    return {
+        etag: task['@odata.etag'],
+        id: task.id,
+        title: task.title,
+        dueDateTime: task.dueDateTime,
+    }
+}
 
-    for(const currentTask of taskList){
-        newList.push({
-            id: currentTask.id,
-            title: currentTask.title
-        })
+function retrieveDetails(taskDetails){
+    const tenantName = taskDetails.description.split("Tenant:")[1].trim()
+    const taskChecklist = []
+
+    for(const checklistitem in taskDetails.checklist){
+        if(taskDetails.checklist[checklistitem].isChecked === false){
+            taskChecklist.push(taskDetails.checklist[checklistitem].title.toLowerCase().trim())
+        }
     }
 
-    return newList
+    return {
+        description: tenantName.substring(0, tenantName.indexOf('\r\n')),
+        contractTerm: taskDetails.description.toLowerCase().indexOf("revision") >= 0 ? new Date(`01 ${taskDetails.description.toLowerCase().split("revision:")[1].trim()}`) : null,
+        checklist: taskChecklist,
+    }
 }
