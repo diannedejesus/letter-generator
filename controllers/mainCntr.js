@@ -104,9 +104,7 @@ module.exports = {
     },
 
     generateLetters: async (req, res)=>{
-        try {
-            console.log(req.session.tasks)
-            
+        try {        
             if(!req.session.accessToken){
                 res.render('index.ejs', { 
                     planners: undefined,
@@ -116,52 +114,8 @@ module.exports = {
             
             let selectedTasks = []
             
-            if(typeof req.body.selectedTasks === "string"){
-                const currentTask = await graph.getSingleTask(req.session.accessToken, req.body.selectedTasks)
-                const taskDetails = await graph.getDetailedTask(req.session.accessToken, currentTask.id)
-                const tenantName = taskDetails.description.split("Tenant:")[1].trim()
-                currentTask.description = tenantName.substring(0, tenantName.indexOf('\r\n'))
-                currentTask.checklist = []
-
-                for(const checklistitem in taskDetails.checklist){
-                    if(taskDetails.checklist[checklistitem].isChecked === false){
-                        currentTask.checklist.push(taskDetails.checklist[checklistitem].title.toLowerCase().trim())
-                    }
-                }
-
-                selectedTasks.push({
-                    id: currentTask.id,
-                    title: currentTask.title,
-                    description: currentTask.description,
-                    dueDateTime: currentTask.dueDateTime,
-                    contractTerm: new Date(`01 ${taskDetails.description.toLowerCase().split("revision:")[1].trim()}`),
-                    checklist: currentTask.checklist,
-                })
-            }else{
-                //get task info
-                for(const currentId of req.body.selectedTasks){
-                    const currentTask = await graph.getSingleTask(req.session.accessToken, currentId)
-                    selectedTasks.push({
-                        id: currentTask.id,
-                        title: currentTask.title,
-                        dueDateTime: currentTask.dueDateTime,
-                    })
-                }
-
-                //get taskdetails
-                for(const currentTask of selectedTasks){
-                    const taskDetails = await graph.getDetailedTask(req.session.accessToken, currentTask.id)
-                    const tenantName = taskDetails.description.split("Tenant:")[1].trim()
-                    currentTask.description = tenantName.substring(0, tenantName.indexOf('\r\n'))
-                    currentTask.checklist = []
-                    currentTask.contractTerm = new Date(`01 ${taskDetails.description.toLowerCase().split("revision:")[1].trim()}`)
-
-                    for(const checklistitem in taskDetails.checklist){
-                        if(taskDetails.checklist[checklistitem].isChecked === false){
-                            currentTask.checklist.push(taskDetails.checklist[checklistitem].title.toLowerCase().trim())
-                        }
-                    }
-                }
+            if(req.body.selectedTasks){   
+                selectedTasks.push(...req.session.tasks.filter(item => req.body.selectedTasks.includes(item.id)))
             }
             
 

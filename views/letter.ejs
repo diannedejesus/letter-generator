@@ -32,7 +32,7 @@
     
                 <h2>RE: Incumplimiento de documentaci&oacute;n requerida</h2>
                 <p>Participant Name: <%= items.description %></p>
-                <p>Vencido desde: <%= items.contractTerm.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></p>
+                <p>Vencido desde: <%= new Date(items.contractTerm).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></p>
                        
                 
                     <% if(items.checklist.includes('hacienda') || items.checklist.includes('patente') || items.checklist.includes('crim')) { %>
@@ -56,7 +56,7 @@
                             <% if(items.checklist.includes('contrato')) { %>
                                 <li>Contrato de arrendamiento entre arrendador y participante
                                     <ul>
-                                        <li>T&eacute;rmino del contrato: <%= items.contractTerm.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) %> al <%= items.contractTerm.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) %></li>
+                                        <li>T&eacute;rmino del contrato: <%= new Date(items.contractTerm).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) %> al <%= new Date(items.contractTerm).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) %></li>
                                     </ul>
                                 </li>
                             <% } %>
