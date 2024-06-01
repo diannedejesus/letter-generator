@@ -5,6 +5,7 @@ const Settings = require('../models/Settings')
 module.exports = { 
     index: async (req, res)=>{
         try{
+            //console.log("mainCntr.js - index", res)
             if(!req.session.accessToken){
                 return res.render('index.ejs', { 
                     planners: undefined,

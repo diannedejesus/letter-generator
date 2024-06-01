@@ -15,8 +15,19 @@ module.exports = function (passport) {
       allowHttpForRedirectUrl: true,
       clientSecret: process.env.OAUTH_APP_PASSWORD,
       validateIssuer: false,
+      //isB2C: config.creds.isB2C,
+      //issuer: config.creds.issuer,
       passReqToCallback: false,
-      scope: process.env.OAUTH_SCOPES.split(' ')
+      scope: process.env.OAUTH_SCOPES.split(' '),
+      // loggingLevel: config.creds.loggingLevel,
+      // loggingNoPII: config.creds.loggingNoPII,
+      // nonceLifetime: config.creds.nonceLifetime,
+      // nonceMaxAmount: config.creds.nonceMaxAmount,
+      // useCookieInsteadOfSession: config.creds.useCookieInsteadOfSession,
+      // cookieSameSite: config.creds.cookieSameSite, // boolean
+      // cookieEncryptionKeys: config.creds.cookieEncryptionKeys,
+      // clockSkew: config.creds.clockSkew,
+      // proxy: { port: 'proxyport', host: 'proxyhost', protocol: 'http' },
     },
     signInComplete
   ));
@@ -28,33 +39,25 @@ module.exports = function (passport) {
       return done(new Error("No OID found in user profile."), null);
     }
 
+    console.log("sign in complete")
+
       try {
-        const ObjectID = require('mongodb').ObjectId;
-        
-        let newUser = {
-          _id: new ObjectID(),
-          microsoftId: profile.oid,
-          displayName: profile.displayName,
-        }
-        //console.log(profile, accessToken, refreshToken)
-        let user = await User.findOne( { microsoftId: newUser.microsoftId })
+        let user = await User.findOne( { microsoftId: profile.oid })
 
-        if (user) {
-           console.log('user found')
+        if (!user) {
+          console.log('user not found')
 
-          user.accessToken = accessToken
-          user.refreshToken = refreshToken
-          
-          done(null, user)
-        } else {
+          let newUser = {
+            microsoftId: profile.oid,
+            displayName: profile.displayName,
+          }
+
           user = await User.create(newUser)
-
-          user.accessToken = accessToken
-          user.refreshToken = refreshToken
-          
-          console.log('created user')
-          done(null, user)
         }
+
+        user.accessToken = accessToken
+        user.refreshToken = refreshToken
+        done(null, user)
 
       } catch (err) {
         console.error(err)
