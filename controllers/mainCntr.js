@@ -6,10 +6,11 @@ module.exports = {
     index: async (req, res)=>{
         try{
             if(!req.session.accessToken){
+                //status
                 return res.render('index.ejs', { 
                     planners: undefined,
                     settings: undefined,
-                    errors: "You need to Sign in to your 365 Account"
+                    error: "You need to Sign in to your 365 Account"
                 })
             }
 
@@ -46,6 +47,7 @@ module.exports = {
                 req.session.tasks = taskList
             }
 
+            //status
             res.render('index.ejs', { 
                 planners: plans ? plans[0] : undefined,
                 settings: req.session.planner ? req.session.planner : undefined,
@@ -57,10 +59,11 @@ module.exports = {
                 //getAccessToken(accessToken)
                 console.log('InvalidAuthenticationToken index-mainCntr')
 
+                //status
                 res.render('index.ejs', { 
                     planners: undefined,
                     settings: undefined,
-                    errors: "You need to Sign in to your 365 Account"
+                    error: "You need to Sign in to your 365 Account"
                 })
             }else{
                 console.log("main error:", err); // TypeError: failed to fetch
@@ -72,10 +75,12 @@ module.exports = {
         try {
             if(!req.body || !req.body.plan){
                 console.log("No values found.")
+                //status
                 res.redirect('/')
             }else{
                 const savedSettings = await Settings.findOne({ microsoftId: req.session.microsoftId })
                 const plan = JSON.parse(req.body.plan)
+
                 if(!savedSettings){
                     const setSettings = {
                         microsoftId: req.session.microsoftId,
@@ -89,29 +94,25 @@ module.exports = {
                         res.status(201)
                         res.redirect('/')
                     }else{
+                        //status
                         res.redirect('/')
                     }
-
-                    //page status code
                 }else{
                     console.log("Settings for this user already exist, did you want to update the current settings?")
                 }
-                
             }
-            
-
         } catch (error) {
             console.log(error)
         }
-        
     },
 
     generateLetters: async (req, res)=>{
         try {        
             if(!req.session.accessToken){
+                //status
                 res.render('index.ejs', { 
                     planners: undefined,
-                    errors: "You need to Sign in to your 365 Account"
+                    error: "You need to Sign in to your 365 Account"
                 })
             }
             
@@ -120,8 +121,8 @@ module.exports = {
             if(req.body.selectedTasks){   
                 selectedTasks.push(...req.session.tasks.filter(item => req.body.selectedTasks.includes(item.id)))
             }
-            
 
+            //status
             res.render('letter.ejs', { 
                 list: selectedTasks ? selectedTasks : undefined,
             })
@@ -129,6 +130,14 @@ module.exports = {
         } catch (error) {
             console.log(error)
         }
+    },
+
+    error: async (req, res)=> {
+            //status
+            return res.render('index.ejs', { 
+                planners: undefined,
+                settings: undefined,
+            })
     },
 }
 

@@ -4,7 +4,10 @@ const mainController = require('../controllers/mainCntr')
 
 
 router.get('/', mainController.index)
+router.get('/err', mainController.error)
+
 router.post('/setPlan', mainController.setPlan)
 router.post('/generateLetters', mainController.generateLetters)
+
 
 module.exports = router

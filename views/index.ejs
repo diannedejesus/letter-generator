@@ -15,12 +15,21 @@
             <li>Set Planner</li>
             <li>Configure Exchange</li>
         </ul>
-        <% if (typeof errors !== 'undefined'){ %>
+        <% if (typeof error !== 'undefined' && error.length > 0){ %>
             <% if (typeof planners === 'undefined'){ %> 
-                <p class='message'><%= errors %></p>
+                <p class='message'>
+                    <% if(typeof error === 'object') { %>
+                        <% error.forEach(item => { %>
+                            <%= console.log(item) %>
+                            <p><%= item.message %></p>
+                        <% }) %>
+                    <% }else { %> 
+                        <%= error %>
+                    <% } %>
+                </p>
                 <a href="/auth/signin" class="">Sign in</a>
             <% }else { %>
-                <p class='message'><%= errors %></p>
+                <p class='message'><%= error %></p>
             <% } %>
         <% } else { %>
             <section class='logon'>    

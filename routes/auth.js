@@ -24,7 +24,7 @@ router.get('/signin',
 router.post('/callback',
   function(req, res, next) {
     console.log('Callback was initiated');
-    console.log("auth.js - /callback", res)
+    //console.log("auth.js - /callback", res)
     
     passport.authenticate('azuread-openidconnect',
       {
@@ -35,7 +35,7 @@ router.post('/callback',
     )(req,res,next);
   },
   async function(req, res) {
-    console.log('We received a return from AzureAD.');
+    console.log('We received an response from AzureAD.');
     //console.log(res.req.user)
     //req.session.timeStamp = Date.now()
     req.session.accessToken = res.req.user.accessToken
@@ -52,13 +52,15 @@ router.post('/callback',
 
 router.get('/signout',
   function(req, res, next) {
-    req.session.destroy(function(err) {
-      req.logout(function(err){
-        if(err) { return next(err)}
+    req.logout(function(err){
+      if(err) { return next(err)}
+      req.session.destroy(function(err) {
+        res.redirect('/');
       });
-
-      res.redirect('/');
     });
+
+
+
   }
 );
 

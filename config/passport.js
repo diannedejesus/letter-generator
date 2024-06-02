@@ -19,8 +19,8 @@ module.exports = function (passport) {
       //issuer: config.creds.issuer,
       passReqToCallback: false,
       scope: process.env.OAUTH_SCOPES.split(' '),
-      // loggingLevel: config.creds.loggingLevel,
-      // loggingNoPII: config.creds.loggingNoPII,
+      loggingLevel: 'info', //gives informational data
+      //loggingNoPII: false,
       // nonceLifetime: config.creds.nonceLifetime,
       // nonceMaxAmount: config.creds.nonceMaxAmount,
       // useCookieInsteadOfSession: config.creds.useCookieInsteadOfSession,
