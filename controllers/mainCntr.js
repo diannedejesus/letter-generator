@@ -5,7 +5,6 @@ const Settings = require('../models/Settings')
 module.exports = { 
     index: async (req, res)=>{
         try{
-            //console.log("mainCntr.js - index", res)
             if(!req.session.accessToken){
                 return res.render('index.ejs', { 
                     planners: undefined,
@@ -14,7 +13,7 @@ module.exports = {
                 })
             }
 
-            let plans, taskList
+            let plans
 
             if(!req.session.planner){
                 console.log("set planner")
@@ -33,7 +32,7 @@ module.exports = {
             
             if(req.session.planner && !req.session.tasks){
                 console.log("set tasklist")
-                taskList = await graph.getAllTasks(req.session.accessToken, req.session.planner.planId)
+                let taskList = await graph.getAllTasks(req.session.accessToken, req.session.planner.planId)
                 taskList = removeCompletedTasks(taskList.value)
                 taskList = taskList.map(task => retrieveIdTitle(task))
 
@@ -46,8 +45,6 @@ module.exports = {
 
                 req.session.tasks = taskList
             }
-
-            //console.log(req.session.tasks)
 
             res.render('index.ejs', { 
                 planners: plans ? plans[0] : undefined,
@@ -150,7 +147,8 @@ function retrieveIdTitle(task){
 }
 
 function retrieveDetails(taskDetails){
-    const tenantName = taskDetails.description.split("Tenant:")[1].trim()
+    const string_norm = taskDetails.description.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
+    const tenantName = string_norm.split("tenant:")[1].trim()
     const taskChecklist = []
 
     for(const checklistitem in taskDetails.checklist){
@@ -161,7 +159,7 @@ function retrieveDetails(taskDetails){
 
     return {
         description: tenantName.substring(0, tenantName.indexOf('\r\n')),
-        contractTerm: taskDetails.description.toLowerCase().indexOf("revision") >= 0 ? new Date(`01 ${taskDetails.description.toLowerCase().split("revision:")[1].trim()}`) : null,
+        contractTerm: string_norm.indexOf("revision") >= 0 ? new Date(`01 ${string_norm.split("revision:")[1].trim()}`) : null,
         checklist: taskChecklist,
     }
 }

@@ -24,7 +24,7 @@ router.get('/signin',
 router.post('/callback',
   function(req, res, next) {
     console.log('Callback was initiated');
-    console.log("auth.js - /callback", res.errored)
+    console.log("auth.js - /callback", res)
     
     passport.authenticate('azuread-openidconnect',
       {
