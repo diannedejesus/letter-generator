@@ -17,6 +17,7 @@ module.exports = {
             let plans, taskList
 
             if(!req.session.planner){
+                console.log("set planner")
                 const settings = await Settings.findOne({ microsoftId: req.session.microsoftId })
 
                 if(settings){
@@ -25,9 +26,13 @@ module.exports = {
                         planId: settings.plannerId
                     }
                 }else{
+                    console.log("no set planner found")
                     plans = await graph.getUserPlanners(req.session.accessToken, req.session.microsoftId)
                 }
-            }else{
+            }
+            
+            if(req.session.planner && !req.session.tasks){
+                console.log("set tasklist")
                 taskList = await graph.getAllTasks(req.session.accessToken, req.session.planner.planId)
                 taskList = removeCompletedTasks(taskList.value)
                 taskList = taskList.map(task => retrieveIdTitle(task))
@@ -47,7 +52,7 @@ module.exports = {
             res.render('index.ejs', { 
                 planners: plans ? plans[0] : undefined,
                 settings: req.session.planner ? req.session.planner : undefined,
-                tasks: taskList ? taskList : undefined
+                tasks: req.session.tasks ? req.session.tasks : undefined
             })
 
         }catch(err){
