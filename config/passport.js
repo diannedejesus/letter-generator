@@ -1,6 +1,4 @@
 const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
-
-// const mongoose = require('mongoose')
 const User = require('../models/User')
 
 module.exports = function (passport) {
@@ -9,7 +7,7 @@ module.exports = function (passport) {
     new OIDCStrategy({
       identityMetadata: `${process.env.OAUTH_AUTHORITY}${process.env.OAUTH_ID_METADATA}`,
       clientID: process.env.OAUTH_APP_ID,
-      responseType: 'code id_token',
+      responseType: 'code',
       responseMode: 'form_post',
       redirectUrl: process.env.OAUTH_REDIRECT_URI,
       allowHttpForRedirectUrl: true,
@@ -40,28 +38,28 @@ module.exports = function (passport) {
     }
 
     console.log("sign in complete")
+    //console.log(refreshToken, params)
+    process.nextTick(async function () {
+      let user = await User.findOne( { microsoftId: profile.oid })
 
-      try {
-        let user = await User.findOne( { microsoftId: profile.oid })
+      if (!user) {
+        console.log('user not found')
 
-        if (!user) {
-          console.log('user not found')
-
-          let newUser = {
-            microsoftId: profile.oid,
-            displayName: profile.displayName,
-          }
-
-          user = await User.create(newUser)
+        let newUser = {
+          microsoftId: profile.oid,
+          displayName: profile.displayName,
         }
 
-        user.accessToken = accessToken
-        user.refreshToken = refreshToken
-        done(null, user)
-
-      } catch (err) {
-        console.error(err)
+        user = await User.create(newUser)
       }
+
+      console.log("access: ", accessToken)
+      console.log("refreshToken: ", refreshToken)
+
+      user.accessToken = accessToken
+      user.refreshToken = refreshToken
+      done(null, user)
+    })
   }
 
   passport.serializeUser((user, done) => {

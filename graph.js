@@ -1,23 +1,37 @@
 const graph = require('@microsoft/microsoft-graph-client');
-//const refreshAccessToken =  require('./bin/refreshToken');
-////let timeStamp = Date.now()
 require('isomorphic-fetch');
 //TODO add error catching for if the timed refresh token is not activated before trying to access the 
 //api
 
 module.exports = {
+  init: function(accessToken){
+    // Initialize Graph client
+    
+    const client = graph.Client.init({
+      // Use the provided access token to authenticate requests
+        authProvider: (done) => {
+          done(null, accessToken);
+        }
+    });
+
+    this.client = client
+    console.log('getAuthenticatedClient')
+    //return client
+    return this
+  },
+  
+  
   getUserDetails: async function(accessToken, userId) {
-//console.log('getUserDetails', userId)
-    //const client = getAuthenticatedClient(accessToken);
-    if(!client){
-      client = await getAuthenticatedClient(accessToken);
-    }
+     console.log(!this.client, this.client)
+    // if(!client){
+    //   client = await getAuthenticatedClient(accessToken);
+    // }
 
     try {
-      ///api call
-      const user = await client
+      //api call
+      const user = await this.client
       .api(`/users/${userId}`)
-      .select('displayName,mail,mailboxSettings,userPrincipalName')
+      .select('displayName,mail,userPrincipalName')
       .get();
 
       return user;
@@ -33,15 +47,12 @@ module.exports = {
   },
 
   getAllGroups: async function getMyGroups(accessToken, userID) {
-//console.log('getAllGroups')
     try{
-      //const client = await getAuthenticatedClient(accessToken);
-      if(!client){
-        client = await getAuthenticatedClient(accessToken);
-      }
-      
+      // if(!client){
+      //   client = await getAuthenticatedClient(accessToken);
+      // }
 
-      return await client  
+      return await this.client  
         .api(`/users/${userID}/transitiveMemberOf`)
         .get();
     } catch (error) {
@@ -55,15 +66,12 @@ module.exports = {
   },
 
   getAllPlanners: async function getPlanners(accessToken, groupID) {
-//console.log('getAllPlanners')
     try{
-      //const client = await getAuthenticatedClient(accessToken);
-      if(!client){
-        client = await getAuthenticatedClient(accessToken);
-      }
-      
+      // if(!client){
+      //   client = await getAuthenticatedClient(accessToken);
+      // }
 
-      return await client
+      return await this.client
         .api(`/groups/${groupID}/planner/plans`)
         .get();
 
@@ -81,14 +89,12 @@ module.exports = {
   },
 
   getAllTasks: async function getTasks(accessToken, planID) {
-//console.log('getAllTasks')
     try{
-      //const client = getAuthenticatedClient(accessToken);
-      if(!client){
-        client = await getAuthenticatedClient(accessToken);
-      }
+      // if(!client){
+      //   client = await getAuthenticatedClient(accessToken);
+      // }
 
-      return await client
+      return await this.client
         .api(`/planner/plans/${planID}/tasks`)
         .get();
 
@@ -103,14 +109,12 @@ module.exports = {
   },
 
   getSingleTask: async function getTasks(accessToken, taskID) {
-//console.log('getSingleTask')
     try{
-      //const client = getAuthenticatedClient(accessToken);
-      if(!client){
-        client = await getAuthenticatedClient(accessToken);
-      }
+      // if(!client){
+      //   client = await getAuthenticatedClient(accessToken);
+      // }
 
-      return await client
+      return await this.client
         .api(`planner/tasks/${taskID}`)
         .get();
 
@@ -125,14 +129,12 @@ module.exports = {
   },
 
   getDetailedTask: async function getTasks(accessToken, taskID) {
-//console.log('getDetailedTask')
     try{
-      //const client = getAuthenticatedClient(accessToken);
-      if(!client){
-        client = await getAuthenticatedClient(accessToken);
-      }
+      // if(!client){
+      //   client = await getAuthenticatedClient(accessToken);
+      // }
 
-      return await client
+      return await this.client
         .api(`planner/tasks/${taskID}/details`)
         .get();
 
@@ -147,14 +149,12 @@ module.exports = {
   },
 
   getTaskTitle: async function getTasks(accessToken, taskID) {
-//console.log('getTaskTitle')
     try{
-      //const client = getAuthenticatedClient(accessToken);
-      if(!client){
-        client = await getAuthenticatedClient(accessToken);
-      }
+      // if(!client){
+      //   client = await getAuthenticatedClient(accessToken);
+      // }
 
-      return await client
+      return await this.client
         .api(`planner/tasks/${taskID}`)
         .select('title')
         .get();
@@ -171,9 +171,8 @@ module.exports = {
 
 
   getUserPlanners: async function getUserPlanners(accessToken, userID) {
-//console.log('getUserPlanner')
- 
     let getUserGroups
+
     try {
       getUserGroups = await this.getAllGroups(accessToken, userID)
     } catch(err) {
@@ -181,13 +180,10 @@ module.exports = {
       throw err
     }
 
-//  console.log(getUserGroups)
-
     let planners = []
   
     await Promise.all(getUserGroups.value.map(
       async (groupInfo) => {
-//       console.log(groupInfo.displayName)
         if(groupInfo.displayName != 'Global Administrator'){
           try {
             const getPlanner  = await this.getAllPlanners(accessToken, groupInfo.id)
@@ -205,7 +201,6 @@ module.exports = {
   },
 
   searchAllPlanners: async function (accessToken, userID, searchTerm){
-//console.log('searchAllPlanners')
     try {
       const planners = await this.getUserPlanners(accessToken, userID)
       let plannerIDs = []
@@ -216,7 +211,6 @@ module.exports = {
           return plannerIDs.push({id: plannerInfo.id, group: plannerGroup.group, name: plannerInfo.title})
         })
       })
-
 
       await Promise.all(plannerIDs.map(
         async (plannerInfo) => {
@@ -233,10 +227,7 @@ module.exports = {
           }
       ))
 
-
       //find task
-      //console.log('Searched for task')
-
       return plannerTasks.filter( taskInfo => taskInfo.title.toLowerCase().includes( searchTerm.toLowerCase() ) )
 
     } catch (error) {
@@ -251,12 +242,10 @@ module.exports = {
   },
 
   createBucket: async function getMyGroups(accessToken, bucketName, planId) {
-//console.log('createBucket')
     try{
-      //const client = getAuthenticatedClient(accessToken);
-      if(!client){
-        client = await getAuthenticatedClient(accessToken);
-      }
+      // if(!client){
+      //   client = await getAuthenticatedClient(accessToken);
+      // }
 
       const plannerBucket = {
         name: bucketName,
@@ -264,7 +253,7 @@ module.exports = {
         orderHint: ' !'
       };
 
-      return await client.api('/planner/buckets')
+      return await this.client.api('/planner/buckets')
         .post(plannerBucket);
      
     } catch (error) {
@@ -278,12 +267,10 @@ module.exports = {
   },
 
   createTask: async function getMyGroups(accessToken, title, planId, bucketId, assignments = {}) {
-//console.log('createTask')
     try{
-      //const client = getAuthenticatedClient(accessToken);
-      if(!client){
-        client = await getAuthenticatedClient(accessToken);
-      }
+      // if(!client){
+      //   client = await getAuthenticatedClient(accessToken);
+      // }
      
       const plannerTask = {
         planId: planId, 
@@ -292,9 +279,8 @@ module.exports = {
         assignments: assignments,
       };
 
-      return await client.api('/planner/tasks')
+      return await this.client.api('/planner/tasks')
         .post(plannerTask);
-     
      
     } catch (error) {
       if(error.code === 'InvalidAuthenticationToken'){
@@ -307,12 +293,10 @@ module.exports = {
   },
 
   editTask: async function getMyGroups(accessToken, taskId) {
-//console.log('editTask')
     try{
-      //const client = getAuthenticatedClient(accessToken);
-      if(!client){
-        client = await getAuthenticatedClient(accessToken);
-      }
+      // if(!client){
+      //   client = await getAuthenticatedClient(accessToken);
+      // }
      
       const plannerTask = {
         // 'Body': {
@@ -321,7 +305,7 @@ module.exports = {
         title: 'Updated task title 2'
       };
 
-      return await client.api(`/planner/tasks/${taskId}`)
+      return await this.client.api(`/planner/tasks/${taskId}`)
       .update(plannerTask);
      
      
@@ -336,19 +320,17 @@ module.exports = {
   },
 
   createPlan: async function getMyGroups(accessToken, groupId, planTitle) {
-//console.log('createPlan') //doesn't work
     try{
-      //const client = getAuthenticatedClient(accessToken);
-      if(!client){
-        client = await getAuthenticatedClient(accessToken);
-      }
+      // if(!client){
+      //   client = await getAuthenticatedClient(accessToken);
+      // }
      
       const plannerTask = {
         owner: groupId,
         title: planTitle,
       };
 
-      return await client.api('/planner/plans')
+      return await this.client.api('/planner/plans')
       .post(plannerTask);
      
      
@@ -363,12 +345,10 @@ module.exports = {
   },
 
   updateDetailedTask: async function getTasks(accessToken, taskID, currentEtag, checklistNames, description) {
-//console.log('getDetailedTask')
     try{
-      //const client = getAuthenticatedClient(accessToken);
-      if(!client){
-        client = await getAuthenticatedClient(accessToken);
-      }
+      // if(!client){
+      //   client = await getAuthenticatedClient(accessToken);
+      // }
 
       let checklistItems = {
         checklist: {},
@@ -388,7 +368,7 @@ module.exports = {
       const plannerTask = checklistItems
       
       
-      return await client
+      return await this.client
         .api(`planner/tasks/${taskID}/details`)
         .headers({ 'If-Match': currentEtag })
         .update(plannerTask);
@@ -406,14 +386,12 @@ module.exports = {
 //Calendar--------------------------------------------------------------------------
 
   getEvents: async function getCalendarEvents(accessToken, userId){
-//console.log('getEvents')
     try{
-      //const client = getAuthenticatedClient(accessToken);
-      if(!client){
-        client = await getAuthenticatedClient(accessToken);
-      }
+      // if(!client){
+      //   client = await getAuthenticatedClient(accessToken);
+      // }
 
-      return await client.api(`/me/calendarview?startdatetime=2021-08-19T21:20:29.145Z&enddatetime=2021-08-26T21:20:29.145Z`)
+      return await this.client.api(`/me/calendarview?startdatetime=2021-08-19T21:20:29.145Z&enddatetime=2021-08-26T21:20:29.145Z`)
         .get();
      
     } catch (error) {
@@ -427,18 +405,20 @@ module.exports = {
   },
 }
 
-let client;
 
-function getAuthenticatedClient(accessToken) {
-  // Initialize Graph client
-  
-  const client = graph.Client.init({
-    // Use the provided access token to authenticate requests
-      authProvider: (done) => {
-        done(null, accessToken);
-      }
-  });
+// let client;
 
-  console.log('getAuthenticatedClient')
-  return client
-}
+//   function getAuthenticatedClient(accessToken) {
+//     // Initialize Graph client
+    
+//     const client = graph.Client.init({
+//       // Use the provided access token to authenticate requests
+//         authProvider: (done) => {
+//           done(null, accessToken);
+//         }
+//     });
+
+//     console.log('getAuthenticatedClient')
+//     return client
+//   }
+

@@ -1,12 +1,13 @@
 //const ewsOptions = require('../ewsConnections')
 const graph = require('../graph')
 const Settings = require('../models/Settings')
+//const refreshAccessToken =  require('../config/refreshToken');
 
 module.exports = { 
     index: async (req, res)=>{
         try{
             if(!req.session.accessToken){
-                //status
+                //error status
                 return res.render('index.ejs', { 
                     planners: undefined,
                     settings: undefined,
@@ -14,6 +15,11 @@ module.exports = {
                 })
             }
 
+            graph.init(req.session.accessToken);
+
+            let test = await graph.getUserDetails(req.session.accessToken, req.session.microsoftId)
+            console.log("test: ", test)
+            
             let plans
 
             if(!req.session.planner){
@@ -56,10 +62,10 @@ module.exports = {
 
         }catch(err){
             if(err.code === 'InvalidAuthenticationToken'){
-                //getAccessToken(accessToken)
+                //await refreshToken()
                 console.log('InvalidAuthenticationToken index-mainCntr')
 
-                //status
+                //error status
                 res.render('index.ejs', { 
                     planners: undefined,
                     settings: undefined,
@@ -75,7 +81,7 @@ module.exports = {
         try {
             if(!req.body || !req.body.plan){
                 console.log("No values found.")
-                //status
+                //error status
                 res.redirect('/')
             }else{
                 const savedSettings = await Settings.findOne({ microsoftId: req.session.microsoftId })
@@ -109,7 +115,7 @@ module.exports = {
     generateLetters: async (req, res)=>{
         try {        
             if(!req.session.accessToken){
-                //status
+                //error status
                 res.render('index.ejs', { 
                     planners: undefined,
                     error: "You need to Sign in to your 365 Account"
@@ -133,7 +139,6 @@ module.exports = {
     },
 
     error: async (req, res)=> {
-            //status
             return res.render('index.ejs', { 
                 planners: undefined,
                 settings: undefined,

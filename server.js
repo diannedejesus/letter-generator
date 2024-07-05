@@ -1,13 +1,10 @@
 const express = require('express')
 const app = express()
 const connectDB = require('./config/database')
-//const homeRoutes = require('./routes/home')
+
 const mainRoutes = require('./routes/mainRts')
 const authRouter = require('./routes/auth');
-//const updateInfoRoutes = require('./routes/updateInformation')
-//routes path
-//const loginRoutes = require('./routes/login') //import auth routes from local modules
-//const signupRoutes = require('./routes/signup')
+
 //const mongoose = require('mongoose')
 const passport = require('passport') // auth middleware
 const session = require('express-session') // Keeps users session logged in and creates the cookie
@@ -30,15 +27,15 @@ app.use(express.json())
 
 
 app.use(
-    session({
-      secret: process.env.YourSECRECT, //this can be anything you want
-      resave: false,
-      saveUninitialized: false,
-      store: MongoStore.create({ 
-        mongoUrl: process.env.DB_STRING
-      }),
-    })
-  )
+  session({
+    secret: process.env.YourSECRECT, //this can be anything you want
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({ 
+      mongoUrl: process.env.DB_STRING
+    }),
+  })
+)
 
 
 // Flash middleware
@@ -68,10 +65,6 @@ app.use(passport.session())
 
 app.use('/', mainRoutes)
 app.use('/auth', authRouter);
-//app.use('/dashboard', dashboardRoutes)
-//app.use('/updateInfo', updateInfoRoutes)
-//app.use('/login', loginRoutes)
-//app.use('/signup', signupRoutes)
 
 app.listen(process.env.PORT, ()=>{
     console.log(`Server is running on PORT: ${process.env.PORT} , you better catch it!`)

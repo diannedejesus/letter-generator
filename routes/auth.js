@@ -6,61 +6,80 @@ const router = express.Router();
 router.get('/signin',
   function  (req, res, next) {
     console.log('Signin was called');
+    //console.log(req)
     passport.authenticate('azuread-openidconnect',
       {
-        response: res,         
-        prompt: 'login',
-        failureRedirect: '/',
+        //response: res,
+        //sessin: false,        
+        //prompt: 'login',
+        failureRedirect: '/err+signin',
         failureFlash: true
       }
     )(req,res,next);
-  },
-  function(req, res) {
-    console.log('Signin was called');
-    res.redirect('/');
   }
 );
 
+function regenerateSessionAfterAuthentication(req, res, next) {
+  var passportInstance = req.session.passport;
+  return req.session.regenerate(function (err){
+    if (err) {
+      return next(err);
+    }
+    req.session.passport = passportInstance;
+    return req.session.save(next);
+  });
+}
+
 router.post('/callback',
-  function(req, res, next) {
-    console.log('Callback was initiated');
-    //console.log("auth.js - /callback", res)
-    
-    passport.authenticate('azuread-openidconnect',
-      {
-        response: res,
-        failureRedirect: '/err',
-        failureFlash: true
-      }
-    )(req,res,next);
-  },
-  async function(req, res) {
-    console.log('We received an response from AzureAD.');
-    //console.log(res.req.user)
+  passport.authenticate('azuread-openidconnect', { failureRedirect: '/err', failureFlash: true }),
+  regenerateSessionAfterAuthentication,
+  async function(req, res){
+    console.log('We received a response from AzureAD.');
     //req.session.timeStamp = Date.now()
+    //req.session.refreshToken = res.req.user.refreshToken
     req.session.accessToken = res.req.user.accessToken
-    req.session.refreshToken = res.req.user.refreshToken
     req.session.microsoftId = res.req.user.microsoftId
     
     req.session.save(function(err) {
-      err ? console.log('session saved') : console.log(err)
+      err ? console.log(err) : console.log('session saved')
+      res.redirect('/');
     })
-    
-    res.redirect('/');
   }
-);
+)
 
-router.get('/signout',
-  function(req, res, next) {
+// router.post('/callback',
+//   function(req, res, next) {
+//     console.log('Callback was initiated');
+//     passport.authenticate('azuread-openidconnect',
+//       {
+//         //response: res,
+//         failureRedirect: '/err',
+//         failureFlash: true
+//       }
+//     )(req,res,next);
+//   },
+//   async function(req, res) {
+//     console.log('We received an response from AzureAD.');
+//     //req.session.timeStamp = Date.now()
+//     req.session.accessToken = res.req.user.accessToken
+//     req.session.refreshToken = res.req.user.refreshToken
+//     req.session.microsoftId = res.req.user.microsoftId
+    
+//     req.session.save(function(err) {
+//       err ? console.log('session saved') : console.log(err)
+//     })
+    
+//     res.redirect('/');
+//   }
+// );
+
+router.get('/signout', function(req, res, next) {
     req.logout(function(err){
       if(err) { return next(err)}
       req.session.destroy(function(err) {
         res.redirect('/');
       });
     });
-
-
-
   }
 );
 
