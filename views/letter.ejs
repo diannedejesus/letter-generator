@@ -17,66 +17,78 @@
     </section>
     <main>
         <% if(typeof list === 'undefined'){ %>
-        <section class="letter">
-            <p>Something went wrong, click back and try again.</p>
-        </section>
-        <% }else{ %>
-            <% list.forEach( (items, index) => { %> 
-                <address>
-                    <%= items.title %><br>
-                    street<br>
-                    city, state zipcode
-                </address>
-                <% let date = Date.now() %>
-                <p><%= new Date(date).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></p>
-    
-                <h2>RE: Incumplimiento de documentaci&oacute;n requerida</h2>
-                <p>Participant Name: <%= items.description %></p>
-                <p>Vencido desde: <%= new Date(items.contractTerm).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></p>
-                       
-                
-                    <% if(items.checklist.includes('hacienda') || items.checklist.includes('patente') || items.checklist.includes('crim')) { %>
-                    <section class="letterBody">
-                        <h3>Certificaci&oacute;n Negativa o evidencia de cumplimiento:</h3>
-                        <ul>
-                            <% if(items.checklist.includes('hacienda')) { %>
-                                <li>Departamento de Hacienda (https://suri.hacienda.pr.gov)</li>
-                            <% } %>
-                            <% if(items.checklist.includes('patente')) { %>
-                                <li>Certificaci&oacute;n de Patente del Municipio de Gurabo (787-737-0046)</li>
-                            <% } %>
-                            <% if(items.checklist.includes('crim')) { %>
-                                <li>CRIM de la vivienda alquilada (https://emueble.crimpr.net)</li>
-                            <% } %>
-                        </ul>
-                    <% } %>
-                    <% if(items.checklist.includes('hap') || items.checklist.includes('contrato')) { %>
-                        <h3>Documentos Additionales:</h3>
-                        <ul>
-                            <% if(items.checklist.includes('contrato')) { %>
-                                <li>Contrato de arrendamiento entre arrendador y participante
-                                    <ul>
-                                        <li>T&eacute;rmino del contrato: <%= new Date(items.contractTerm).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) %> al <%= new Date(items.contractTerm).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) %></li>
-                                    </ul>
-                                </li>
-                            <% } %>
-                            <% if(items.checklist.includes('hap')) { %>
-                                <li>Firmar Contrato HAP</li>
-                            <% } %>
-                        </ul>
-                    <% } %> 
-                 
-                </section>
-    
-                <section class="signature">
-                    <p>Sincerly</p>
-                    <p>officials name</p> 
-                </section>
+            <section class="letter">
+                <p>Something went wrong, click back and try again.</p>
             </section>
-            <footer>
-                <p>This company name</p>
-                <p>our address city, st 000###</p>
-            </footer>
+        <% }else{ %>
+            
+            <% list.forEach( (items, index) => { %>                
+                <section class="letter">
+    
+                    <header><img src="/logo.png" /></header>
+                
+                    <section class="letterbody">
+                    
+                        <address>
+                            <%= items.title %><br>
+                            street<br>
+                            city, state zipcode
+                        </address>
+
+                        <% let date = Date.now() %>
+                        <p class="letterdate"><%= new Date(date).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></p>
+                        <h4>Segundo Aviso</h4>
+                        <h2>RE: Documentaci&oacute;n requerida</h2>
+
+                        <p>El subsidio de alquiler para su inquilino <b><%= items.description %></b> fue renovado para el 
+                            <b><%= new Date(items.contractTerm).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) %></b>. Requerimos que complete los documentos solicitados para continuar 
+                            aportando la cantidad descrita en la carta de renovacion anual. </p>
+
+                        <p>Usted debe completar los siguientes documentos antes de <b><%= new Date(items.dueDateTime).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></b>:</p>
+                       
+                        <section class="letterdocuments">
+                        <% if(items.checklist.includes('hacienda') || items.checklist.includes('patente') || items.checklist.includes('crim')) { %>
+                            <h3>Certificaci&oacute;n Negativa o evidencia de cumplimiento:</h3>
+                            <ul>
+                                <% if(items.checklist.includes('hacienda')) { %>
+                                    <li>Certificaci&oacute;n del Departamento de Hacienda (https://suri.hacienda.pr.gov)</li>
+                                <% } %>
+                                <% if(items.checklist.includes('patente')) { %>
+                                    <li>Patente de Alquiler del Municipio de Gurabo (787-737-0046)</li>
+                                <% } %>
+                                <% if(items.checklist.includes('crim')) { %>
+                                    <li>CRIM de la vivienda alquilada (https://emueble.crimpr.net)</li>
+                                <% } %>
+                            </ul>
+                        <% } %>
+                        <% if(items.checklist.includes('hap') || items.checklist.includes('contrato')) { %>
+                            <h3>Documentos Additionales:</h3>
+                            <ul>
+                                <% if(items.checklist.includes('contrato')) { %>
+                                    <li>Contrato de arrendamiento entre arrendador y participante/inquilino
+                                        <ul>
+                                            <li>T&eacute;rmino del contrato: <%= new Date(items.contractTerm).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) %> al <%= new Date(items.contractTerm_end).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) %></li>
+                                        </ul>
+                                    </li>
+                                <% } %>
+                                <% if(items.checklist.includes('hap')) { %>
+                                    <li>Firmar Contrato HAP</li>
+                                <% } %>
+                            </ul>
+                        <% } %> 
+                        </section>
+                        <p>De no recibir estos documentos antes de la fecha indicada los pagos del subsidio puede verse afectado. Si tienes alguna duda al respecto, favor de comunicarse al 787-712-1100.</p>
+                        <section class="signature">
+                            <p>Sincerly</p>
+                            <p>officials name</p> 
+                        </section>
+                    </section>
+
+                    <footer>
+                        <p>This company name</p>
+                        <p>our address city, st 000###</p>
+                    </footer>
+                </section>
 
             <% if(list.length-1 > index) { %>
                 <div class="pagebreak"> </div>
@@ -84,10 +96,6 @@
         <% }) %>
         <% } %>
     </main>
- 
-    
-
-
     <script src="../../js/main.js"></script>
 </body>
 </html>

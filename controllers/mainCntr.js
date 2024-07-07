@@ -19,7 +19,7 @@ module.exports = {
 
             let test = await graph.getUserDetails(req.session.accessToken, req.session.microsoftId)
             console.log("test: ", test)
-            
+
             let plans
 
             if(!req.session.planner){
@@ -163,7 +163,14 @@ function retrieveIdTitle(task){
 function retrieveDetails(taskDetails){
     const string_norm = taskDetails.description.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
     const tenantName = string_norm.split("tenant:")[1].trim()
+    const tenantRevision = string_norm.indexOf("revision") >= 0 ? string_norm.split("revision:")[1].trim() : null;
     const taskChecklist = []
+
+    let newDate = new Date(`01 ${tenantRevision}`);
+    newDate.setFullYear(newDate.getFullYear() + 1); //needs to go first to account for leap year
+    newDate.setDate(newDate.getDate() - 1);
+    
+    
 
     for(const checklistitem in taskDetails.checklist){
         if(taskDetails.checklist[checklistitem].isChecked === false){
@@ -173,7 +180,8 @@ function retrieveDetails(taskDetails){
 
     return {
         description: tenantName.substring(0, tenantName.indexOf('\r\n')),
-        contractTerm: string_norm.indexOf("revision") >= 0 ? new Date(`01 ${string_norm.split("revision:")[1].trim()}`) : null,
+        contractTerm: tenantRevision ? new Date(`01 ${tenantRevision}`) : null,
+        contractTerm_end: tenantRevision ? newDate : null,
         checklist: taskChecklist,
     }
 }
