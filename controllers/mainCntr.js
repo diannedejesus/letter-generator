@@ -17,9 +17,6 @@ module.exports = {
 
             graph.init(req.session.accessToken);
 
-            let test = await graph.getUserDetails(req.session.accessToken, req.session.microsoftId)
-            console.log("test: ", test)
-
             let plans
 
             if(!req.session.planner){
@@ -40,17 +37,23 @@ module.exports = {
             if(req.session.planner && !req.session.tasks){
                 console.log("set tasklist")
                 let taskList = await graph.getAllTasks(req.session.accessToken, req.session.planner.planId)
-                taskList = removeCompletedTasks(taskList.value)
-                taskList = taskList.map(task => retrieveIdTitle(task))
-
-                for(let i=0; i<taskList.length; i++){
-                    const taskDetails = await graph.getDetailedTask(req.session.accessToken, taskList[i].id)
-                    const theDetails = retrieveDetails(taskDetails)
-
-                    taskList[i] = {...taskList[i], ...theDetails}
+                console.log("task error ", tasklist)
+                if(taskList){
+                    taskList = removeCompletedTasks(taskList.value)
+                    taskList = taskList.map(task => retrieveIdTitle(task))
+    
+                    for(let i=0; i<taskList.length; i++){
+                        const taskDetails = await graph.getDetailedTask(req.session.accessToken, taskList[i].id)
+                        const theDetails = retrieveDetails(taskDetails)
+    
+                        taskList[i] = {...taskList[i], ...theDetails}
+                    }
+    
+                    req.session.tasks = taskList
+    
+                    //let planInfo = await graph.getPlannerDetails(req.session.planner.planId)
+                    //console.log(planInfo)
                 }
-
-                req.session.tasks = taskList
             }
 
             //status
@@ -73,6 +76,12 @@ module.exports = {
                 })
             }else{
                 console.log("main error:", err); // TypeError: failed to fetch
+                //error status
+                res.render('index.ejs', { 
+                    planners: undefined,
+                    settings: undefined,
+                    error: "An error occurred in main index"
+                })
             }
         }
     },

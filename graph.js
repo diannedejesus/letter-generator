@@ -21,7 +21,7 @@ module.exports = {
   },
   
   
-  getUserDetails: async function(accessToken, userId) {
+  getUserDetails: async function(userId) {
      console.log(!this.client, this.client)
     // if(!client){
     //   client = await getAuthenticatedClient(accessToken);
@@ -41,12 +41,13 @@ module.exports = {
         //send error to caller
         throw error
       }else{
-        console.log(error);
+        console.log("Error originated in: getUserDetails from graph.js");
+        throw error
       }
     }
   },
 
-  getAllGroups: async function getMyGroups(accessToken, userID) {
+  getAllGroups: async function getMyGroups(userID) {
     try{
       // if(!client){
       //   client = await getAuthenticatedClient(accessToken);
@@ -60,12 +61,13 @@ module.exports = {
         //send error to caller
         throw error
       }else{
-        console.log(error);
+        console.log("Error originated in: getAllGroups from graph.js");
+        throw error
       }
     }
   },
 
-  getAllPlanners: async function getPlanners(accessToken, groupID) {
+  getAllPlanners: async function getPlanners(groupID) {
     try{
       // if(!client){
       //   client = await getAuthenticatedClient(accessToken);
@@ -83,12 +85,61 @@ module.exports = {
         console.log(error.body);
       }
       else{
-        console.log(error);
+        console.log("Error originated in: getAllPlanners from graph.js");
+        throw error
       }
     }
   },
 
-  getAllTasks: async function getTasks(accessToken, planID) {
+  getPlanner: async function getPlanner(planID) {
+    try{
+      // if(!client){
+      //   client = await getAuthenticatedClient(accessToken);
+      // }
+
+      return await this.client
+        .api(`/planner/plans/${planID}`)
+        .get();
+
+    } catch (error) {
+      if(error.code === 'InvalidAuthenticationToken'){
+        //send error to caller
+        throw error
+      }else if(error.statusCode === 403) {
+        console.log(error.body);
+      }
+      else{
+        console.log("Error originated in: getPlanner from graph.js");
+        throw error
+      }
+    }
+  },
+
+  getPlannerDetails: async function getPlanner(planID) {
+    try{
+      // if(!client){
+      //   client = await getAuthenticatedClient(accessToken);
+      // }
+
+      return await this.client
+        .api(`/planner/plans/${planID}/details`)
+        .get();
+
+    } catch (error) {
+      if(error.code === 'InvalidAuthenticationToken'){
+        //send error to caller
+        throw error
+      }else if(error.statusCode === 403) {
+        console.log(error.body);
+      }
+      else{
+        console.log("Error originated in: getPlannerDetails from graph.js");
+        throw error
+      }
+    }
+  },
+
+  getAllTasks: async function getTasks(planID) {
     try{
       // if(!client){
       //   client = await getAuthenticatedClient(accessToken);
@@ -103,12 +154,13 @@ module.exports = {
         //send error to caller
         throw error
       }else{
-        console.log(error);
+        console.log("Error originated in: getAllTasks from graph.js");
+        throw error
       }
     }
   },
 
-  getSingleTask: async function getTasks(accessToken, taskID) {
+  getSingleTask: async function getTasks(taskID) {
     try{
       // if(!client){
       //   client = await getAuthenticatedClient(accessToken);
@@ -123,12 +175,13 @@ module.exports = {
         //send error to caller
         throw error
       }else{
-        console.log(error);
+        console.log("Error originated in: getSingleTask from graph.js");
+        throw error
       }
     }
   },
 
-  getDetailedTask: async function getTasks(accessToken, taskID) {
+  getDetailedTask: async function getTasks(taskID) {
     try{
       // if(!client){
       //   client = await getAuthenticatedClient(accessToken);
@@ -143,12 +196,13 @@ module.exports = {
         //send error to caller
         throw error
       }else{
-        console.log(error);
+        console.log("Error originated in: getDetailedTask from graph.js");
+        throw error
       }
     }
   },
 
-  getTaskTitle: async function getTasks(accessToken, taskID) {
+  getTaskTitle: async function getTasks(taskID) {
     try{
       // if(!client){
       //   client = await getAuthenticatedClient(accessToken);
@@ -164,7 +218,8 @@ module.exports = {
         //send error to caller
         throw error
       }else{
-        console.log(error);
+        console.log("Error originated in: getTaskTitle from graph.js");
+        throw error
       }
     }
   },
@@ -241,7 +296,7 @@ module.exports = {
 
   },
 
-  createBucket: async function getMyGroups(accessToken, bucketName, planId) {
+  createBucket: async function getMyGroups(bucketName, planId) {
     try{
       // if(!client){
       //   client = await getAuthenticatedClient(accessToken);
@@ -261,12 +316,13 @@ module.exports = {
         //send error to caller
         throw error
       }else{
-        console.log(error);
+        console.log("Error originated in: createBucket from graph.js");
+        throw error
       }
     }
   },
 
-  createTask: async function getMyGroups(accessToken, title, planId, bucketId, assignments = {}) {
+  createTask: async function getMyGroups(title, planId, bucketId, assignments = {}) {
     try{
       // if(!client){
       //   client = await getAuthenticatedClient(accessToken);
@@ -287,12 +343,13 @@ module.exports = {
         //send error to caller
         throw error
       }else{
-        console.log(error);
+        console.log("createTask from graph.js");
+        throw error
       }
     }
   },
 
-  editTask: async function getMyGroups(accessToken, taskId) {
+  editTask: async function getMyGroups(taskId) {
     try{
       // if(!client){
       //   client = await getAuthenticatedClient(accessToken);
@@ -314,12 +371,13 @@ module.exports = {
         //send error to caller
         throw error
       }else{
-        console.log(error);
+        console.log("Error originated in: editTask from graph.js");
+        throw error
       }
     }
   },
 
-  createPlan: async function getMyGroups(accessToken, groupId, planTitle) {
+  createPlan: async function getMyGroups(groupId, planTitle) {
     try{
       // if(!client){
       //   client = await getAuthenticatedClient(accessToken);
@@ -339,12 +397,13 @@ module.exports = {
         //send error to caller
         throw error
       }else{
-        console.log(error);
+        console.log("createPlan from graph.js");
+        throw error
       }
     }
   },
 
-  updateDetailedTask: async function getTasks(accessToken, taskID, currentEtag, checklistNames, description) {
+  updateDetailedTask: async function getTasks(taskID, currentEtag, checklistNames, description) {
     try{
       // if(!client){
       //   client = await getAuthenticatedClient(accessToken);
@@ -378,14 +437,15 @@ module.exports = {
         //send error to caller
         throw error
       }else{
-        console.log(error);
+        console.log("Error originated in: updateDetailedTask from graph.js");
+        throw error
       }
     }
   },
 
 //Calendar--------------------------------------------------------------------------
 
-  getEvents: async function getCalendarEvents(accessToken, userId){
+  getEvents: async function getCalendarEvents(userId){
     try{
       // if(!client){
       //   client = await getAuthenticatedClient(accessToken);
@@ -399,7 +459,8 @@ module.exports = {
         //send error to caller
         throw error
       }else{
-        console.log(error);
+        console.log("Error originated in: getEvent from graph.js");
+        throw error
       }
     }
   },
