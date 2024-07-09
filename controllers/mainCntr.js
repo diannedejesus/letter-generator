@@ -36,31 +36,35 @@ module.exports = {
             
             if(req.session.planner && !req.session.tasks){
                 console.log("set tasklist")
-                let taskList = await graph.getAllTasks(req.session.accessToken, req.session.planner.planId)
-                console.log("task error ", tasklist)
+                let taskList = await graph.getAllTasks(req.session.planner.planId)
+
                 if(taskList){
                     taskList = removeCompletedTasks(taskList.value)
                     taskList = taskList.map(task => retrieveIdTitle(task))
     
                     for(let i=0; i<taskList.length; i++){
-                        const taskDetails = await graph.getDetailedTask(req.session.accessToken, taskList[i].id)
+                        const taskDetails = await graph.getDetailedTask(taskList[i].id)
                         const theDetails = retrieveDetails(taskDetails)
     
                         taskList[i] = {...taskList[i], ...theDetails}
                     }
     
+                    let planInfo = await graph.getPlannerDetails(req.session.planner.planId)
+                    if(planInfo){
+                        req.session.planLabelNames = planInfo.categoryDescriptions
+                        
+                    }
+
                     req.session.tasks = taskList
-    
-                    //let planInfo = await graph.getPlannerDetails(req.session.planner.planId)
-                    //console.log(planInfo)
                 }
             }
-
+            //console.log(req.session.planLabelNames)
             //status
             res.render('index.ejs', { 
                 planners: plans ? plans[0] : undefined,
                 settings: req.session.planner ? req.session.planner : undefined,
-                tasks: req.session.tasks ? req.session.tasks : undefined
+                tasks: req.session.tasks ? req.session.tasks : undefined,
+                planLabels: req.session.planLabelNames
             })
 
         }catch(err){
@@ -161,11 +165,20 @@ function removeCompletedTasks(taskList){
 }
 
 function retrieveIdTitle(task){
+    let labelList = []
+
+    for(const label in task.appliedCategories){
+        if(task.appliedCategories[label]){
+            labelList.push(label)
+        }
+    }
+
     return {
         etag: task['@odata.etag'],
         id: task.id,
         title: task.title,
         dueDateTime: task.dueDateTime,
+        labels: labelList,
     }
 }
 
