@@ -39,6 +39,29 @@ module.exports = {
                 let taskList = await graph.getAllTasks(req.session.planner.planId)
 
                 if(taskList){
+                    let planInfo = await graph.getPlannerDetails(req.session.planner.planId)
+                    let currentLabels = []
+
+                    taskList.value.forEach(task => {
+                        currentLabels.push(...Object.keys(task.appliedCategories))
+                    })
+
+                    currentLabels = [...new Set(currentLabels)]
+                    if(planInfo){
+                        let filterList = {}
+                        
+                        for(const label in planInfo.categoryDescriptions){
+                            if(currentLabels.includes(label)){
+                                filterList[label] = planInfo.categoryDescriptions[label]
+                            }
+                        }
+
+                        req.session.planLabelNames = filterList
+                        
+                    }
+                    //currentLabels = currentLabels.map(label => planInfo.categoryDescriptions[label] ? planInfo.categoryDescriptions[label] : label)
+                    //req.session.planLabelNames = currentLabels 
+
                     taskList = removeCompletedTasks(taskList.value)
                     taskList = taskList.map(task => retrieveIdTitle(task))
     
@@ -48,17 +71,11 @@ module.exports = {
     
                         taskList[i] = {...taskList[i], ...theDetails}
                     }
-    
-                    let planInfo = await graph.getPlannerDetails(req.session.planner.planId)
-                    if(planInfo){
-                        req.session.planLabelNames = planInfo.categoryDescriptions
-                        
-                    }
 
                     req.session.tasks = taskList
                 }
             }
-            //console.log(req.session.planLabelNames)
+            //console.log(req.session.tasks)
             //status
             res.render('index.ejs', { 
                 planners: plans ? plans[0] : undefined,
@@ -123,6 +140,30 @@ module.exports = {
         } catch (error) {
             console.log(error)
         }
+    },
+
+    filterTasks: async (req, res)=>{
+        if(!req.params || !req.params.label){
+            console.log("No values found.")
+            //error status
+            res.redirect('/')
+        }
+        console.log(req.params.label)
+        for(const task of req.session.tasks){
+            console.log(task)
+            console.log(task.labels ? task.labels.includes(req.params.label) : "No labels")
+        }
+
+        let filterTasks = req.session.tasks.filter(task => task.labels.includes(req.params.label))
+//console.log(filterTasks)
+
+
+        res.render('index.ejs', { 
+            //planners: plans ? plans[0] : undefined,
+            settings: req.session.planner ? req.session.planner : undefined,
+            tasks: filterTasks ? filterTasks : req.session.tasks ? req.session.tasks : undefined,
+            planLabels: req.session.planLabelNames
+        })
     },
 
     generateLetters: async (req, res)=>{

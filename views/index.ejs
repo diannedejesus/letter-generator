@@ -40,7 +40,7 @@
                         <select name="plan">
                             <option>Select One</option>
                             <% for(plans of planners.planner) { %> 
-                            <option value='{"planId":"<%=plans.id%>", "planName":"<%=plans.title%>"}'><%= plans.title %></option>
+                            <option value='{"planId":"<%= plans.id %>", "planName":"<%= plans.title %>"}'><%= plans.title %></option>
                             <% } %>
                         </select>
                         <input type="submit" />
@@ -48,10 +48,10 @@
                 <% } else { %>
                     <p>The selected plan is: <%= settings.planName %></p> 
                     <% if(planLabels){ %>
-                        <%= console.log(planLabels) %>
-                        <ul>
+                        <ul class="catergoryLabel">
+                            <li><a href="/">All</a>
                             <% for(const label in planLabels){ %>
-                                <li><%= planLabels[label] ? planLabels[label] : label %></li>
+                                <li><a href="/filterTasks/<%= label %>"><%= planLabels[label] ? planLabels[label] : label %></a></li>
                             <% } %>
                         </ul>
                     <% } %>

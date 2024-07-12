@@ -81,6 +81,11 @@ h4 {
   padding: 1.5em;
 }
 
+.catergoryLabel li {
+  display: inline-block;
+  margin-right: 1em;
+}
+
 address {
   margin: 4em 0 0 0;
 }
